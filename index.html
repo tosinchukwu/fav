@@ -3,43 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Union Bridge: Sepolia LINK to Holesky</title>
+    <title>Union LINK Bridge: Sepolia to Holesky</title>
     <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        /* Previous styles unchanged for brevity */
-        .wallet-connect-btn {
-            width: 100%;
-            max-width: 650px;
-            padding: 1rem;
-            background-color: #4B0082;
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: transform 0.2s ease, box-shadow 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 1rem;
-        }
-        .wallet-connect-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(75, 0, 130, 0.4);
-        }
-        .wallet-connect-btn:active {
-            transform: scale(0.98);
-        }
-        .wallet-connected {
-            background-color: #6A0DAD;
-            cursor: default;
-        }
-        .wallet-connected:hover {
-            transform: none;
-            box-shadow: none;
-        }
+        /* Existing styles unchanged */
         :root {
             --primary-color: #2563eb;
             --secondary-color: #10b981;
@@ -51,14 +20,16 @@
             --console-bg: #1e293b;
             --console-text: #4ade80;
         }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
+
         body {
             font-family: 'Lexend', sans-serif;
-            background: #FFA500;
+            background: linear-gradient(135deg, #e6f2ff 0%, #d9e2ec 100%);
             color: var(--text-primary);
             line-height: 1.6;
             display: flex;
@@ -67,6 +38,7 @@
             min-height: 100vh;
             padding: 2rem;
         }
+
         .header {
             text-align: center;
             margin-bottom: 2rem;
@@ -74,23 +46,27 @@
             flex-direction: column;
             align-items: center;
         }
+
         .header-icon {
             font-size: 3.5rem;
             color: var(--primary-color);
             margin-bottom: 0.75rem;
             animation: pulse 2s infinite;
         }
+
         @keyframes pulse {
             0% { transform: scale(1); }
             50% { transform: scale(1.1); }
             100% { transform: scale(1); }
         }
+
         .header h1 {
-            color: #333;
+            color: var(--primary-color);
             font-weight: 700;
             font-size: 2.5rem;
             margin-bottom: 0.5rem;
         }
+
         .input-group {
             width: 100%;
             max-width: 650px;
@@ -101,19 +77,23 @@
             border-radius: 10px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.05);
         }
+
         .input-group label {
             display: block;
             margin-bottom: 0.5rem;
             font-weight: 600;
-            color: #1a202c;
+            color: var(--text-secondary);
         }
+
         .input-group label i {
             margin-right: 0.5rem;
             color: var(--primary-color);
         }
+
         .input-wrapper {
             position: relative;
         }
+
         .input-wrapper input {
             width: 100%;
             padding: 0.875rem 1rem;
@@ -121,17 +101,19 @@
             border-radius: 10px;
             transition: all 0.3s ease;
             font-family: 'Lexend', sans-serif;
-            color: #1a202c;
         }
+
         .input-wrapper input:focus {
             outline: none;
             border-color: var(--primary-color);
             box-shadow: 0 0 10px rgba(37, 99, 235, 0.3);
             background-color: #f0f4ff;
         }
+
         .input-wrapper input:hover {
             border-color: var(--primary-color);
         }
+
         .wallet-address {
             font-size: 0.875rem;
             color: var(--text-secondary);
@@ -145,6 +127,7 @@
             overflow: hidden;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
+
         .wallet-address span {
             white-space: nowrap;
             overflow: hidden;
@@ -152,6 +135,7 @@
             flex: 1;
             margin-right: 0.5rem;
         }
+
         .clear-wallet-btn {
             background: none;
             border: none;
@@ -159,9 +143,11 @@
             cursor: pointer;
             transition: color 0.3s ease;
         }
+
         .clear-wallet-btn:hover {
             color: #f87171;
         }
+
         .btn {
             width: 100%;
             max-width: 650px;
@@ -178,28 +164,34 @@
             justify-content: center;
             margin-top: 1rem;
         }
+
         .btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 12px rgba(37, 99, 235, 0.4);
         }
+
         .btn:active {
             transform: scale(0.98);
         }
+
         .console-container {
             width: 100%;
             max-width: 650px;
             margin-top: 1rem;
         }
+
         .console-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 0.5rem;
         }
+
         .console-header span {
             color: var(--text-secondary);
             font-weight: 500;
         }
+
         .console {
             background-color: var(--console-bg);
             color: var(--console-text);
@@ -212,29 +204,36 @@
             scrollbar-width: thin;
             scrollbar-color: #2563eb #1e293b;
         }
+
         .console::-webkit-scrollbar {
             width: 8px;
             background-color: #1e293b;
         }
+
         .console::-webkit-scrollbar-thumb {
             background-color: #2563eb;
             border-radius: 4px;
         }
+
         .console-log {
             white-space: nowrap;
             opacity: 0;
             animation: fadeIn 0.5s forwards;
         }
+
         @keyframes fadeIn {
             to { opacity: 1; }
         }
+
         .console-log a {
             color: #1e90ff;
             text-decoration: none;
         }
+
         .console-log a:hover {
             text-decoration: underline;
         }
+
         .clear-logs-btn {
             background: none;
             border: none;
@@ -244,12 +243,15 @@
             display: flex;
             align-items: center;
         }
+
         .clear-logs-btn:hover {
             color: #f87171;
         }
+
         .clear-logs-btn i {
             margin-left: 0.3rem;
         }
+
         .advanced-toggle {
             width: 100%;
             max-width: 650px;
@@ -257,10 +259,12 @@
             align-items: center;
             margin-bottom: 1rem;
         }
+
         .advanced-toggle i {
             margin-right: 0.5rem;
             color: var(--primary-color);
         }
+
         .toggle-switch {
             position: relative;
             display: inline-block;
@@ -268,11 +272,13 @@
             height: 20px;
             margin-right: 10px;
         }
+
         .toggle-switch input {
             opacity: 0;
             width: 0;
             height: 0;
         }
+
         .slider {
             position: absolute;
             cursor: pointer;
@@ -284,6 +290,7 @@
             transition: .4s;
             border-radius: 34px;
         }
+
         .slider:before {
             position: absolute;
             content: "";
@@ -295,25 +302,31 @@
             transition: .4s;
             border-radius: 50%;
         }
+
         input:checked + .slider {
             background-color: var(--primary-color);
         }
+
         input:checked + .slider:before {
             transform: translateX(20px);
         }
+
         .input-row {
             display: flex;
             gap: 1rem;
             max-width: 650px;
             width: 100%;
         }
+
         .input-row .input-group {
             flex: 1;
         }
+
         @media (max-width: 680px) {
             body {
                 padding: 1rem;
             }
+
             .input-group,
             .btn,
             .console-container,
@@ -321,12 +334,15 @@
             .input-row {
                 max-width: 100%;
             }
+
             .input-row {
                 flex-direction: column;
             }
+
             .wallet-address {
                 flex-wrap: wrap;
             }
+
             .wallet-address span {
                 white-space: normal;
                 word-break: break-all;
@@ -337,15 +353,7 @@
 <body>
     <div class="header">
         <i class="fas fa-exchange-alt header-icon"></i>
-        <h1>Sepolia LINK to Holesky Bridge (Gas in ETH)</h1>
-    </div>
-
-    <button class="wallet-connect-btn" id="connectWalletButton">Connect Wallet</button>
-    <div id="walletAddress" class="wallet-address" style="display: none;">
-        <span id="walletAddressText"></span>
-        <button class="clear-wallet-btn" id="disconnectWalletButton">
-            <i class="fas fa-sign-out-alt"></i>
-        </button>
+        <h1>LINK Bridge: Sepolia to Holesky</h1>
     </div>
 
     <div class="input-group">
@@ -360,15 +368,28 @@
         </div>
         <div id="customRPCSection" style="display:none;">
             <div class="input-wrapper">
-                <input type="text" id="customRPCInput" placeholder="Enter custom RPC URL (e.g., https://eth-sepolia.example.com)">
+                <input type="text" id="customRPCInput" placeholder="Enter custom RPC URL (e.g., https://rpc.sepolia.org)">
             </div>
+        </div>
+    </div>
+
+    <div class="input-group">
+        <label><i class="fas fa-key"></i> Private Key</label>
+        <div class="input-wrapper">
+            <input type="password" id="privateKey" placeholder="Enter your private key securely">
+        </div>
+        <div id="walletAddress" class="wallet-address" style="display: none;">
+            <span id="walletAddressText"></span>
+            <button class="clear-wallet-btn" id="clearWalletButton">
+                <i class="fas fa-trash"></i>
+            </button>
         </div>
     </div>
 
     <div class="input-group">
         <label><i class="fas fa-wallet"></i> Holesky Receiving Address</label>
         <div class="input-wrapper">
-            <input type="text" id="holeskyAddress" value="0x8b241bE57C75F160A5A675773a6f762FD1896929" placeholder="0x...">
+            <input type="text" id="holeskyAddress" placeholder="0x1234567890abcdef1234567890abcdef12345678">
         </div>
     </div>
 
@@ -376,7 +397,7 @@
         <div class="input-group">
             <label><i class="fas fa-coins"></i> LINK Amount</label>
             <div class="input-wrapper">
-                <input type="number" id="linkAmount" value="0.0001" placeholder="Enter LINK amount" step="0.0001" min="0.0001">
+                <input type="number" id="linkAmount" placeholder="Enter LINK amount" step="0.001" min="0.001">
             </div>
         </div>
         <div class="input-group">
@@ -394,7 +415,7 @@
         </div>
     </div>
 
-    <button class="btn" id="executeButton" disabled>Bridge LINK</button>
+    <button class="btn" id="executeButton">Bridge LINK</button>
 
     <div class="console-container">
         <div class="console-header">
@@ -407,20 +428,17 @@
     </div>
 
     <script>
-        // Configuration
-        const contractAddress = '0x5FbE74A283f7954f10AA04C2eDf55578811aeb03'; // Sepolia port contract (verified via Union Explorer)
-        const baseToken = '0x779877A7B0D9E8603169DdbD7836e478b4624789'; // Sepolia LINK token
-        const channelId = 11; // TODO: Verify Holesky channelId via app.union.build/explorer or @union_build
-        const sepoliaChainId = '11155111'; // Sepolia chain ID
-        const suspiciousString = 'bbn168fft4g777vnf9880plpehj2fzwjkeedc0c2s389eqa3cngh4s6scetjaz';
-        const defaultRPC = 'https://eth-sepolia.public.blastapi.io'; // Reliable Sepolia RPC
+        // Placeholder addresses - REPLACE WITH ACTUAL VALUES FROM UNION DOCUMENTATION
+        const contractAddress = '0xREPLACE_WITH_UNION_BRIDGE_CONTRACT_SEPOLIA'; // Union bridge contract on Sepolia
+        const baseToken = '0x779877A7B0D9E8603169DdbD7836e478b4624789'; // LINK token on Sepolia
+        const channelId = 999; // REPLACE WITH CORRECT CHANNEL ID FOR SEPOLIA-TO-HOLESKY
 
-        const connectWalletButton = document.getElementById('connectWalletButton');
-        const disconnectWalletButton = document.getElementById('disconnectWalletButton');
-        const walletAddressDisplay = document.getElementById('walletAddress');
-        const walletAddressText = document.getElementById('walletAddressText');
         const customRPCToggle = document.getElementById('customRPCToggle');
         const customRPCSection = document.getElementById('customRPCSection');
+        const privateKeyInput = document.getElementById('privateKey');
+        const walletAddressDisplay = document.getElementById('walletAddress');
+        const walletAddressText = document.getElementById('walletAddressText');
+        const clearWalletButton = document.getElementById('clearWalletButton');
         const holeskyAddressInput = document.getElementById('holeskyAddress');
         const linkAmountInput = document.getElementById('linkAmount');
         const transactionCountInput = document.getElementById('transactionCount');
@@ -429,215 +447,156 @@
         const consoleOutput = document.getElementById('consoleOutput');
         const clearLogsButton = document.getElementById('clearLogsButton');
 
-        let provider, signer, connectedAddress;
-
-        // Toggle custom RPC section
         customRPCToggle.addEventListener('change', function() {
             customRPCSection.style.display = this.checked ? 'block' : 'none';
         });
 
-        // Connect wallet
-        connectWalletButton.addEventListener('click', async () => {
-            if (!window.ethereum) {
-                createLogEntry('Please install MetaMask or Rabby to use this application', 'error');
-                return;
-            }
-
+        privateKeyInput.addEventListener('input', function() {
             try {
-                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-                connectedAddress = accounts[0];
-                provider = new ethers.providers.Web3Provider(window.ethereum);
-                signer = provider.getSigner();
-
-                const network = await provider.getNetwork();
-                if (network.chainId.toString() !== sepoliaChainId) {
-                    try {
-                        await window.ethereum.request({
-                            method: 'wallet_switchEthereumChain',
-                            params: [{ chainId: `0x${parseInt(sepoliaChainId).toString(16)}` }],
-                        });
-                    } catch (switchError) {
-                        if (switchError.code === 4902) {
-                            await window.ethereum.request({
-                                method: 'wallet_addEthereumChain',
-                                params: [{
-                                    chainId: `0x${parseInt(sepoliaChainId).toString(16)}`,
-                                    chainName: 'Sepolia Testnet',
-                                    rpcUrls: [defaultRPC],
-                                    nativeCurrency: { name: 'Sepolia ETH', symbol: 'ETH', decimals: 18 },
-                                    blockExplorerUrls: ['https://sepolia.etherscan.io'],
-                                }],
-                            });
-                        } else {
-                            throw switchError;
-                        }
-                    }
-                }
-
-                walletAddressText.textContent = `Connected: ${shortenAddress(connectedAddress)}`;
+                const wallet = new ethers.Wallet(this.value);
+                walletAddressText.textContent = `Wallet: ${wallet.address}`;
                 walletAddressDisplay.style.display = 'flex';
-                connectWalletButton.textContent = 'Wallet Connected';
-                connectWalletButton.classList.add('wallet-connected');
-                connectWalletButton.disabled = true;
-                executeButton.disabled = false;
-                createLogEntry(`Wallet connected: ${shortenAddress(connectedAddress)}`, 'success');
-
-                window.ethereum.on('accountsChanged', (accounts) => {
-                    if (accounts.length === 0) {
-                        disconnectWallet();
-                    } else {
-                        connectedAddress = accounts[0];
-                        walletAddressText.textContent = `Connected: ${shortenAddress(connectedAddress)}`;
-                        createLogEntry(`Account changed to: ${shortenAddress(connectedAddress)}`, 'info');
-                    }
-                });
-
-                window.ethereum.on('chainChanged', (chainId) => {
-                    if (chainId !== `0x${parseInt(sepoliaChainId).toString(16)}`) {
-                        createLogEntry('Please switch to Sepolia Testnet', 'error');
-                        disconnectWallet();
-                    }
-                });
             } catch (error) {
-                createLogEntry(`Wallet connection failed: ${error.message}`, 'error');
+                walletAddressText.textContent = 'Invalid Private Key';
+                walletAddressDisplay.style.display = 'flex';
             }
         });
 
-        // Disconnect wallet
-        disconnectWalletButton.addEventListener('click', disconnectWallet);
-
-        function disconnectWallet() {
-            connectedAddress = null;
-            provider = null;
-            signer = null;
+        clearWalletButton.addEventListener('click', function() {
+            privateKeyInput.value = '';
             walletAddressDisplay.style.display = 'none';
-            connectWalletButton.textContent = 'Connect Wallet';
-            connectWalletButton.classList.remove('wallet-connected');
-            connectWalletButton.disabled = false;
-            executeButton.disabled = true;
-            createLogEntry('Wallet disconnected', 'info');
-        }
+        });
 
-        // Clear console logs
         clearLogsButton.addEventListener('click', function() {
             while (consoleOutput.firstChild) {
                 consoleOutput.removeChild(consoleOutput.firstChild);
             }
         });
 
-        // Bridge LINK with gas fees paid in ETH
         async function prepareBridge() {
-            if (!provider || !signer) {
-                createLogEntry('Please connect your wallet first', 'error');
-                return;
-            }
-
             executeButton.disabled = true;
             executeButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
             try {
-                const holeskyAddress = holeskyAddressInput.value.trim();
-                if (!ethers.utils.isAddress(holeskyAddress)) {
-                    if (holeskyAddress === suspiciousString) {
-                        throw new Error(`Invalid Holesky address: '${suspiciousString}' is not a valid Ethereum address. Please enter a valid 0x... address.`);
-                    }
-                    throw new Error('Invalid Holesky receiving address. Must be a valid 0x... Ethereum address.');
-                }
-
+                const privateKey = privateKeyInput.value;
+                const holeskyAddress = holeskyAddressInput.value;
                 const linkAmount = linkAmountInput.value;
-                if (!linkAmount || isNaN(linkAmount) || Number(linkAmount) <= 0) {
-                    throw new Error("Please provide a valid LINK amount greater than 0");
-                }
-                createLogEntry(`LINK amount per transaction: ${linkAmount} LINK`, 'info');
-
                 const transactionCount = parseInt(transactionCountInput.value);
-                if (transactionCount <= 0) {
-                    throw new Error("Transaction count must be greater than 0");
-                }
-                createLogEntry(`Number of transactions: ${transactionCount}`, 'info');
-
-                const baseAmount = ethers.utils.parseUnits(linkAmount, 18); // LINK has 18 decimals
-                const totalAmount = baseAmount.mul(transactionCount);
-                createLogEntry(`Total LINK amount for ${transactionCount} transactions: ${ethers.utils.formatUnits(totalAmount, 18)} LINK`, 'info');
-
-                let txProvider = provider;
+                let provider;
                 if (customRPCToggle.checked) {
-                    const customRPC = document.getElementById('customRPCInput').value.trim();
+                    const customRPC = document.getElementById('customRPCInput').value;
                     if (!customRPC) {
                         throw new Error('Custom RPC URL is required when using custom RPC');
                     }
-                    txProvider = new ethers.providers.JsonRpcProvider(customRPC);
+                    provider = new ethers.providers.JsonRpcProvider(customRPC);
                 } else {
-                    txProvider = new ethers.providers.JsonRpcProvider(defaultRPC);
+                    provider = new ethers.providers.JsonRpcProvider('https://rpc.sepolia.org');
                 }
 
-                const contract = new ethers.Contract(contractAddress, [
+                const wallet = new ethers.Wallet(privateKey, provider);
+                createLogEntry('Initializing bridge transaction...', 'info');
+                const abi = [
                     "function transferAndCall(uint32 channelId, bytes memory receiver, address baseToken, uint256 baseAmount, bytes memory quoteToken, uint256 quoteAmount, bytes memory contractAddress, bytes memory contractCalldata, uint64 timeoutHeight, uint64 timeoutTimestamp, bytes32 salt) external"
-                ], signer);
+                ];
+                const contract = new ethers.Contract(contractAddress, abi, wallet);
 
-                const tokenContract = new ethers.Contract(baseToken, [
+                const erc20Abi = [
                     "function approve(address spender, uint256 amount) external returns (bool)",
-                    "function allowance(address owner, address spender) external view returns (uint256)",
-                    "function balanceOf(address account) external view returns (uint256)"
-                ], signer);
+                    "function allowance(address owner, address spender) external view returns (uint256)"
+                ];
+                const tokenContract = new ethers.Contract(baseToken, erc20Abi, wallet);
+                const baseAmount = ethers.utils.parseUnits(linkAmount, 18); // LINK uses 18 decimals
+                const totalAmount = baseAmount.mul(transactionCount);
 
-                // Check LINK balance
-                const linkBalance = await tokenContract.balanceOf(connectedAddress);
-                if (linkBalance.lt(totalAmount)) {
-                    throw new Error(`Insufficient LINK balance: ${ethers.utils.formatUnits(linkBalance, 18)} LINK available. Get more at faucets.chain.link/sepolia`);
-                }
-                createLogEntry(`LINK balance: ${ethers.utils.formatUnits(linkBalance, 18)} LINK`, 'info');
-
-                // Check ETH balance for gas fees
-                const ethBalance = await provider.getBalance(connectedAddress);
-                const gasPriceEstimate = await txProvider.getGasPrice();
-                const estimatedGasPerTx = ethers.BigNumber.from('500000'); // Based on failed tx
-                const estimatedTotalGasCost = gasPriceEstimate.mul(estimatedGasPerTx).mul(transactionCount);
-                if (ethBalance.lt(estimatedTotalGasCost)) {
-                    throw new Error(`Insufficient ETH for gas fees: ${ethers.utils.formatEther(ethBalance)} ETH available, ~${ethers.utils.formatEther(estimatedTotalGasCost)} ETH required`);
-                }
-                createLogEntry(`ETH balance for gas: ${ethers.utils.formatEther(ethBalance)} ETH`, 'info');
-
-                // Fetch and adjust gas price
-                const currentBaseFee = await txProvider.getGasPrice();
-                createLogEntry(`Network base gas price: ${ethers.utils.formatUnits(currentBaseFee, 'gwei')} GWEI`, 'info');
-
-                const maxBaseFee = ethers.utils.parseUnits('3', 'gwei');
-                const adjustedBaseFee = currentBaseFee.gt(maxBaseFee) ? maxBaseFee : currentBaseFee;
-                createLogEntry(`Adjusted base gas price: ${ethers.utils.formatUnits(adjustedBaseFee, 'gwei')} GWEI`, 'info');
-
-                const gasBoostValue = gasBoostInput.value ?
-                    ethers.utils.parseUnits(gasBoostInput.value.toString(), 'gwei') :
+                const currentBaseFee = await provider.getGasPrice();
+                const gasBoostValue = gasBoostInput.value ? 
+                    ethers.utils.parseUnits(gasBoostInput.value.toString(), 'gwei') : 
                     ethers.utils.parseUnits('0', 'gwei');
-
-                const preliminaryGasPrice = adjustedBaseFee.add(gasBoostValue);
-                const maxTotalGasPrice = ethers.utils.parseUnits('10', 'gwei');
-                const gasPrice = preliminaryGasPrice.gt(maxTotalGasPrice) ? maxTotalGasPrice : preliminaryGasPrice;
-
-                createLogEntry(`Using gas price: ${ethers.utils.formatUnits(gasPrice, 'gwei')} GWEI (Adjusted Base: ${ethers.utils.formatUnits(adjustedBaseFee, 'gwei')} + Boost: ${ethers.utils.formatUnits(gasBoostValue, 'gwei')})`, 'info');
-
-                // Check and approve LINK allowance
-                const allowance = await tokenContract.allowance(connectedAddress, contractAddress);
-                createLogEntry(`Current LINK allowance for port ${contractAddress}: ${ethers.utils.formatUnits(allowance, 18)} LINK`, 'info');
+                const gasPrice = currentBaseFee.add(gasBoostValue);
+                createLogEntry(`Using gas price: ${ethers.utils.formatUnits(gasPrice, 'gwei')} GWEI (Base: ${ethers.utils.formatUnits(currentBaseFee, 'gwei')} + Boost: ${ethers.utils.formatUnits(gasBoostValue, 'gwei')})`, 'info');
+                const allowance = await tokenContract.allowance(wallet.address, contractAddress);
+                createLogEntry(`Current allowance: ${ethers.utils.formatUnits(allowance, 18)} LINK`, 'info');
                 if (allowance.lt(totalAmount)) {
-                    createLogEntry('Approving LINK for port contract...', 'info');
-                    const approveTxGasEstimate = await tokenContract.estimateGas.approve(contractAddress, ethers.constants.MaxUint256, { gasPrice });
-                    const gasLimit = approveTxGasEstimate.mul(110).div(100);
-                    const approveTx = await tokenContract.approve(contractAddress, ethers.constants.MaxUint256, { gasPrice, gasLimit });
+                    createLogEntry('Approving maximum amount for LINK...', 'info');
+                    const approveTx = await tokenContract.approve(contractAddress, ethers.constants.MaxUint256, { gasPrice });
                     createLogEntry('Approval Tx Hash: ', 'info', approveTx.hash);
                     await approveTx.wait();
-                    createLogEntry('LINK approved successfully', 'success');
+                    createLogEntry('Token approved successfully', 'success');
                 } else {
-                    createLogEntry('Sufficient LINK allowance already exists', 'info');
+                    createLogEntry('Sufficient allowance already exists', 'info');
                 }
-
-                // Execute bridge transactions
                 for (let i = 0; i < transactionCount; i++) {
-                    const receiver = ethers.utils.hexZeroPad(holeskyAddress, 32);
-                    // TODO: Verify Holesky quoteToken and contractAddressParam
-                    const quoteToken = ethers.utils.hexZeroPad('0xE4E7b5aDDf001f594E7aAf44358f0a346bF6D6F6', 32); // Holesky LINK (tentative)
-                    const contractAddressParam = ethers.utils.hexZeroPad('0x4B5d0fB98fC73b53eB96dE89A4e9263cb3e27e2A', 32); // Holesky port (tentative)
+                    const receiver = ethers.utils.hexlify(ethers.utils.toUtf8Bytes(holeskyAddress)); // Holesky address as bytes
+                    const quoteToken = ethers.utils.toUtf8Bytes("0xREPLACE_WITH_HOLESKY_QUOTE_TOKEN"); // REPLACE WITH HOLESKY QUOTE TOKEN
+                    const contractAddressParam = ethers.utils.toUtf8Bytes("0xREPLACE_WITH_HOLESKY_CONTRACT_ADDRESS"); // REPLACE WITH HOLESKY CONTRACT ADDRESS
                     const timeoutHeight = ethers.BigNumber.from("0xffffffffffffffff");
                     const timeoutTimestamp = 0;
-                    const salt = ethers.utils.randomBytes(32); // Random salt
-                    if (suspiciousString === ethers.utils.hexlify(salt) || holeskyAddress === suspiciousString) {
-                        throw new Error(`Invalid input: '${suspiciousString}' detected. Use
+                    const salt = ethers.utils.randomBytes(32);
+
+                    createLogEntry(`Executing bridge transfer ${i + 1} of ${transactionCount}...`, 'info');
+                    const tx = await contract.transferAndCall(
+                        channelId,
+                        receiver,
+                        baseToken,
+                        baseAmount,
+                        quoteToken,
+                        baseAmount,
+                        contractAddressParam,
+                        "0x",
+                        timeoutHeight,
+                        timeoutTimestamp,
+                        salt,
+                        { gasPrice }
+                    );
+                    createLogEntry('Tx Hash: ', 'success', tx.hash);
+                    await tx.wait();
+                    createLogEntry(`Transaction ${i + 1} confirmed`, 'success');
+                }
+
+                createLogEntry('All bridge transfers completed successfully', 'success');
+            } catch (error) {
+                createLogEntry(`Error: ${error.message}`, 'error');
+            } finally {
+                executeButton.disabled = false;
+                executeButton.innerHTML = 'Bridge LINK';
+            }
+        }
+
+        executeButton.addEventListener('click', prepareBridge);
+
+        function createLogEntry(message, type = 'info', txHash = null) {
+            const logEntry = document.createElement('div');
+            logEntry.classList.add('console-log');
+            
+            const timestamp = new Date().toLocaleTimeString();
+            const typeColor = {
+                'info': '#4ade80',
+                'error': '#f87171',
+                'success': '#60a5fa'
+            };
+
+            let messageContent = message;
+            if (txHash) {
+                let explorerUrl;
+                if (message.startsWith('Approval Tx Hash:')) {
+                    explorerUrl = `https://sepolia.etherscan.io/tx/${txHash}`;
+                } else {
+                    explorerUrl = `https://app.union.build/explorer/transfers/${txHash}`;
+                }
+                messageContent += ` <a href="${explorerUrl}" target="_blank">${shortenHash(txHash)}</a>`;
+            }
+
+            logEntry.innerHTML = `
+                <span style="color: #64748b; margin-right: 0.5rem;">[${timestamp}]</span>
+                <span style="color: ${typeColor[type]}">${messageContent}</span>
+            `;
+
+            consoleOutput.appendChild(logEntry);
+            consoleOutput.scrollTop = consoleOutput.scrollHeight;
+        }
+
+        function shortenHash(hash) {
+            return `${hash.slice(0, 6)}...${hash.slice(-4)}`;
+        }
+    </script>
+</body>
+</html>
