@@ -8,7 +8,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        /* Existing styles unchanged */
         :root {
             --primary-color: #2563eb;
             --secondary-color: #10b981;
@@ -174,13 +173,21 @@
             transform: scale(0.98);
         }
 
+        .connect-wallet-btn {
+            background-color: var(--secondary-color);
+        }
+
+        .connect-wallet-btn:hover {
+            box-shadow: 0 6px 12px rgba(16, 185, 129, 0.4);
+        }
+
         .console-container {
             width: 100%;
             max-width: 650px;
             margin-top: 1rem;
         }
 
-        .console-header {
+        .console-headerprototype {
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -374,14 +381,14 @@
     </div>
 
     <div class="input-group">
-        <label><i class="fas fa-key"></i> Private Key</label>
-        <div class="input-wrapper">
-            <input type="password" id="privateKey" placeholder="Enter your private key securely">
-        </div>
+        <label><i class="fas fa-wallet"></i> Wallet Connection</label>
+        <button class="btn connect-wallet-btn" id="connectWalletButton">
+            <i class="fas fa-wallet"></i> Connect Wallet
+        </button>
         <div id="walletAddress" class="wallet-address" style="display: none;">
             <span id="walletAddressText"></span>
-            <button class="clear-wallet-btn" id="clearWalletButton">
-                <i class="fas fa-trash"></i>
+            <button class="clear-wallet-btn" id="disconnectWalletButton">
+                <i class="fas fa-sign-out-alt"></i>
             </button>
         </div>
     </div>
@@ -415,7 +422,7 @@
         </div>
     </div>
 
-    <button class="btn" id="executeButton">Bridge LINK</button>
+    <button class="btn" id="executeButton" disabled>Bridge LINK</button>
 
     <div class="console-container">
         <div class="console-header">
@@ -435,10 +442,10 @@
 
         const customRPCToggle = document.getElementById('customRPCToggle');
         const customRPCSection = document.getElementById('customRPCSection');
-        const privateKeyInput = document.getElementById('privateKey');
+        const connectWalletButton = document.getElementById('connectWalletButton');
+        const disconnectWalletButton = document.getElementById('disconnectWalletButton');
         const walletAddressDisplay = document.getElementById('walletAddress');
         const walletAddressText = document.getElementById('walletAddressText');
-        const clearWalletButton = document.getElementById('clearWalletButton');
         const holeskyAddressInput = document.getElementById('holeskyAddress');
         const linkAmountInput = document.getElementById('linkAmount');
         const transactionCountInput = document.getElementById('transactionCount');
@@ -447,25 +454,72 @@
         const consoleOutput = document.getElementById('consoleOutput');
         const clearLogsButton = document.getElementById('clearLogsButton');
 
+        let connectedAccount = null;
+        let provider = null;
+
         customRPCToggle.addEventListener('change', function() {
             customRPCSection.style.display = this.checked ? 'block' : 'none';
         });
 
-        privateKeyInput.addEventListener('input', function() {
-            try {
-                const wallet = new ethers.Wallet(this.value);
-                walletAddressText.textContent = `Wallet: ${wallet.address}`;
-                walletAddressDisplay.style.display = 'flex';
-            } catch (error) {
-                walletAddressText.textContent = 'Invalid Private Key';
-                walletAddressDisplay.style.display = 'flex';
+        async function connectWallet() {
+            if (!window.ethereum) {
+                createLogEntry('MetaMask or Rabby Wallet not detected. Please install a compatible wallet.', 'error');
+                return;
             }
-        });
 
-        clearWalletButton.addEventListener('click', function() {
-            privateKeyInput.value = '';
+            try {
+                // Request account access
+                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                connectedAccount = accounts[0];
+                provider = new ethers.providers.Web3Provider(window.ethereum);
+
+                // Switch to Sepolia network
+                await window.ethereum.request({
+                    method: 'wallet_switchEthereumChain',
+                    params: [{ chainId: '0xaa36a7' }], // Sepolia chain ID: 11155111
+                });
+
+                walletAddressText.textContent = `Connected: ${connectedAccount}`;
+                walletAddressDisplay.style.display = 'flex';
+                connectWalletButton.style.display = 'none';
+                executeButton.disabled = false;
+                createLogEntry(`Wallet connected: ${connectedAccount}`, 'success');
+
+                // Listen for account or chain changes
+                window.ethereum.on('accountsChanged', (accounts) => {
+                    if (accounts.length === 0) {
+                        disconnectWallet();
+                    } else {
+                        connectedAccount = accounts[0];
+                        walletAddressText.textContent = `Connected: ${connectedAccount}`;
+                        createLogEntry(`Wallet changed: ${connectedAccount}`, 'info');
+                    }
+                });
+
+                window.ethereum.on('chainChanged', (chainId) => {
+                    if (chainId !== '0xaa36a7') {
+                        createLogEntry('Please switch to Sepolia network.', 'error');
+                        executeButton.disabled = true;
+                    } else {
+                        executeButton.disabled = false;
+                    }
+                });
+            } catch (error) {
+                createLogEntry(`Error connecting wallet: ${error.message}`, 'error');
+            }
+        }
+
+        function disconnectWallet() {
+            connectedAccount = null;
+            provider = null;
             walletAddressDisplay.style.display = 'none';
-        });
+            connectWalletButton.style.display = 'block';
+            executeButton.disabled = true;
+            createLogEntry('Wallet disconnected', 'info');
+        }
+
+        connectWalletButton.addEventListener('click', connectWallet);
+        disconnectWalletButton.addEventListener('click', disconnectWallet);
 
         clearLogsButton.addEventListener('click', function() {
             while (consoleOutput.firstChild) {
@@ -474,46 +528,50 @@
         });
 
         async function prepareBridge() {
+            if (!connectedAccount || !provider) {
+                createLogEntry('Please connect your wallet first.', 'error');
+                return;
+            }
+
             executeButton.disabled = true;
             executeButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
             try {
-                const privateKey = privateKeyInput.value;
                 const holeskyAddress = holeskyAddressInput.value;
                 const linkAmount = linkAmountInput.value;
                 const transactionCount = parseInt(transactionCountInput.value);
-                let provider;
+                let rpcProvider;
                 if (customRPCToggle.checked) {
                     const customRPC = document.getElementById('customRPCInput').value;
                     if (!customRPC) {
                         throw new Error('Custom RPC URL is required when using custom RPC');
                     }
-                    provider = new ethers.providers.JsonRpcProvider(customRPC);
+                    rpcProvider = new ethers.providers.JsonRpcProvider(customRPC);
                 } else {
-                    provider = new ethers.providers.JsonRpcProvider('https://rpc.sepolia.org');
+                    rpcProvider = provider; // Use wallet provider for consistency
                 }
 
-                const wallet = new ethers.Wallet(privateKey, provider);
+                const signer = provider.getSigner();
                 createLogEntry('Initializing bridge transaction...', 'info');
                 const abi = [
                     "function transferAndCall(uint32 channelId, bytes memory receiver, address baseToken, uint256 baseAmount, bytes memory quoteToken, uint256 quoteAmount, bytes memory contractAddress, bytes memory contractCalldata, uint64 timeoutHeight, uint64 timeoutTimestamp, bytes32 salt) external"
                 ];
-                const contract = new ethers.Contract(contractAddress, abi, wallet);
+                const contract = new ethers.Contract(contractAddress, abi, signer);
 
                 const erc20Abi = [
                     "function approve(address spender, uint256 amount) external returns (bool)",
                     "function allowance(address owner, address spender) external view returns (uint256)"
                 ];
-                const tokenContract = new ethers.Contract(baseToken, erc20Abi, wallet);
+                const tokenContract = new ethers.Contract(baseToken, erc20Abi, signer);
                 const baseAmount = ethers.utils.parseUnits(linkAmount, 18); // LINK uses 18 decimals
                 const totalAmount = baseAmount.mul(transactionCount);
 
-                const currentBaseFee = await provider.getGasPrice();
+                const currentBaseFee = await rpcProvider.getGasPrice();
                 const gasBoostValue = gasBoostInput.value ? 
                     ethers.utils.parseUnits(gasBoostInput.value.toString(), 'gwei') : 
                     ethers.utils.parseUnits('0', 'gwei');
                 const gasPrice = currentBaseFee.add(gasBoostValue);
                 createLogEntry(`Using gas price: ${ethers.utils.formatUnits(gasPrice, 'gwei')} GWEI (Base: ${ethers.utils.formatUnits(currentBaseFee, 'gwei')} + Boost: ${ethers.utils.formatUnits(gasBoostValue, 'gwei')})`, 'info');
-                const allowance = await tokenContract.allowance(wallet.address, contractAddress);
+                const allowance = await tokenContract.allowance(connectedAccount, contractAddress);
                 createLogEntry(`Current allowance: ${ethers.utils.formatUnits(allowance, 18)} LINK`, 'info');
                 if (allowance.lt(totalAmount)) {
                     createLogEntry('Approving maximum amount for LINK...', 'info');
@@ -547,7 +605,7 @@
                         salt,
                         { gasPrice }
                     );
-                    createLogEntry('Tx Hash: ', 'success', tx.hash);
+                    create egalogEntry('Tx Hash: ', 'success', tx.hash);
                     await tx.wait();
                     createLogEntry(`Transaction ${i + 1} confirmed`, 'success');
                 }
