@@ -8,6 +8,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
+        /* Existing styles remain unchanged */
         .wallet-connect-btn {
             width: 100%;
             max-width: 650px;
@@ -236,7 +237,7 @@
             border-radius: 10px;
             min-height: 150px;
             max-height: 300px;
-            overflow-y: auto;
+            overflow k-y: auto;
             scrollbar-width: thin;
             scrollbar-color: #2563eb #1e293b;
         }
@@ -389,7 +390,7 @@
 <body>
     <div class="header">
         <i class="fas fa-exchange-alt header-icon"></i>
-        <h1>Sepolia WETH to Holesky Bridge</h1>
+        <h1>Sepolia WETH to Holesky Bridge (Gas in ETH)</h1>
     </div>
 
     <button class="wallet-connect-btn" id="connectWalletButton">Connect Wallet</button>
@@ -461,7 +462,7 @@
     <script>
         // Configuration (placeholders, verify via app.union.build)
         const contractAddress = '0x5FbE74A283f7954f10AA04C2eDf55578811aeb03'; // TODO: Update with correct Sepolia-to-Holesky bridge contract
-        const baseToken = '0x779877a7b0d9e8603169ddbd7836e478b4624789'; // Sepolia LINK
+        const baseToken = '0x779877a7b0d9e8603169ddbd7836e478b4624789'; // Sepolia WETH (not LINK as in original comment)
         const channelId = 11; // TODO: Update with correct Holesky channelId
         const sepoliaChainId = '11155111'; // Sepolia chain ID
 
@@ -579,7 +580,7 @@
             }
         });
 
-        // Bridge WETH
+        // Bridge WETH with gas fees paid in ETH
         async function prepareBridge() {
             if (!provider || !signer) {
                 createLogEntry('Please connect your wallet first', 'error');
@@ -628,14 +629,32 @@
 
                 const tokenContract = new ethers.Contract(baseToken, [
                     "function approve(address spender, uint256 amount) external returns (bool)",
-                    "function allowance(address owner, address spender) external view returns (uint256)"
+                    "function allowance(address owner, address spender) external view returns (uint256)",
+                    "function balanceOf(address account) external view returns (uint256)"
                 ], signer);
+
+                // Check WETH balance
+                const wethBalance = await tokenContract.balanceOf(connectedAddress);
+                if (wethBalance.lt(totalAmount)) {
+                    throw new Error(`Insufficient WETH balance: ${ethers.utils.formatUnits(wethBalance, 18)} WETH available`);
+                }
+                createLogEntry(`WETH balance: ${ethers.utils.formatUnits(wethBalance, 18)} WETH`, 'info');
+
+                // Check ETH balance for gas fees
+                const ethBalance = await provider.getBalance(connectedAddress);
+                const gasPriceEstimate = await txProvider.getGasPrice();
+                const estimatedGasPerTx = ethers.BigNumber.from('200000'); // Conservative estimate for transferAndCall
+                const estimatedTotalGasCost = gasPriceEstimate.mul(estimatedGasPerTx).mul(transactionCount);
+                if (ethBalance.lt(estimatedTotalGasCost)) {
+                    throw new Error(`Insufficient ETH for gas fees: ${ethers.utils.formatEther(ethBalance)} ETH available, ~${ethers.utils.formatEther(estimatedTotalGasCost)} ETH required`);
+                }
+                createLogEntry(`ETH balance for gas: ${ethers.utils.formatEther(ethBalance)} ETH`, 'info');
 
                 // Fetch and adjust the gas price
                 const currentBaseFee = await txProvider.getGasPrice();
                 createLogEntry(`Network base gas price: ${ethers.utils.formatUnits(currentBaseFee, 'gwei')} GWEI`, 'info');
 
-                // Cap the base gas price at 5 gwei to avoid unreasonably high values
+                // Cap the base gas price at 3 gwei to avoid unreasonably high values
                 const maxBaseFee = ethers.utils.parseUnits('3', 'gwei'); // 3 gwei
                 const adjustedBaseFee = currentBaseFee.gt(maxBaseFee) ? maxBaseFee : currentBaseFee;
                 createLogEntry(`Adjusted base gas price: ${ethers.utils.formatUnits(adjustedBaseFee, 'gwei')} GWEI`, 'info');
@@ -652,9 +671,9 @@
 
                 createLogEntry(`Using gas price: ${ethers.utils.formatUnits(gasPrice, 'gwei')} GWEI (Adjusted Base: ${ethers.utils.formatUnits(adjustedBaseFee, 'gwei')} + Boost: ${ethers.utils.formatUnits(gasBoostValue, 'gwei')})`, 'info');
 
-                // Check and approve token allowance
+                // Check and approve token allowance for WETH
                 const allowance = await tokenContract.allowance(connectedAddress, contractAddress);
-                createLogEntry(`Current allowance: ${ethers.utils.formatUnits(allowance, 18)} WETH`, 'info');
+                createLogEntry(`Current WETH allowance: ${ethers.utils.formatUnits(allowance, 18)} WETH`, 'info');
                 if (allowance.lt(totalAmount)) {
                     createLogEntry('Approving maximum amount for WETH...', 'info');
                     // Estimate gas for the approve transaction
@@ -663,9 +682,9 @@
                     const approveTx = await tokenContract.approve(contractAddress, ethers.constants.MaxUint256, { gasPrice, gasLimit });
                     createLogEntry('Approval Tx Hash: ', 'info', approveTx.hash);
                     await approveTx.wait();
-                    createLogEntry('Token approved successfully', 'success');
+                    createLogEntry('WETH approved successfully', 'success');
                 } else {
-                    createLogEntry('Sufficient allowance already exists', 'info');
+                    createLogEntry('Sufficient WETH allowance already exists', 'info');
                 }
 
                 // Execute bridge transactions
@@ -680,7 +699,8 @@
                     const salt = ethers.utils.randomBytes(32);
 
                     createLogEntry(`Executing bridge transfer ${i + 1} of ${transactionCount}...`, 'info');
-                    const tx = await contract.transferAndCall(
+                    // Estimate gas for the transferAndCall transaction
+                    const txGasEstimate = await contract.estimateGas.transferAndCall(
                         channelId,
                         receiver,
                         baseToken,
@@ -693,6 +713,21 @@
                         timeoutTimestamp,
                         salt,
                         { gasPrice }
+                    );
+                    const gasLimit = txGasEstimate.mul(110).div(100); // 110% of estimate
+                    const tx = await contract.transferAndCall(
+                        channelId,
+                        receiver,
+                        baseToken,
+                        baseAmount,
+                        quoteToken,
+                        baseAmount,
+                        contractAddressParam,
+                        "0x",
+                        timeoutHeight,
+                        timeoutTimestamp,
+                        salt,
+                        { gasPrice, gasLimit }
                     );
                     createLogEntry('Tx Hash: ', 'success', tx.hash);
                     await tx.wait();
