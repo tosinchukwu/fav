@@ -65,7 +65,7 @@
 
         body {
             font-family: 'Lexend', sans-serif;
-            background: #D2691E;
+            background: #FFA500;
             color: var(--text-primary);
             line-height: 1.6;
             display: flex;
@@ -463,7 +463,7 @@
         // Configuration
         const contractAddress = '0x5FbE74A283f7954f10AA04C2eDf55578811aeb03'; // Sepolia port contract (verified via Union Explorer)
         const baseToken = '0x779877A7B0D9E8603169DdbD7836e478b4624789'; // Sepolia LINK token
-        const channelId = 11; // TODO: Verify Holesky channelId via app.union.build or Union team
+        const channelId = 11; // TODO: Verify Holesky channelId via app.union.build/explorer or Union team
         const sepoliaChainId = '11155111'; // Sepolia chain ID
 
         const connectWalletButton = document.getElementById('connectWalletButton');
@@ -726,7 +726,7 @@
                         );
                         createLogEntry('Tx Hash: ', 'success', tx.hash);
                         await tx.wait();
-                        createLogEntry(`Transaction ${i + 1} confirmed`, 'success');
+                        createLogEntry(`Transaction ${i + 1} confirmed. Check Union Explorer: https://app.union.build/explorer/transfers/${tx.hash}`, 'success');
                     } catch (txError) {
                         throw new Error(`Bridge transaction failed: ${txError.message}${txError.data ? ' (Data: ' + txError.data + ')' : ''}`);
                     }
@@ -756,7 +756,7 @@
             };
 
             let messageContent = message;
-            if (txHash) {
+            if (txHash && !message.includes('Union Explorer')) {
                 let explorerUrl;
                 if (message.startsWith('Approval Tx Hash:')) {
                     explorerUrl = `https://sepolia.etherscan.io/tx/${txHash}`;
