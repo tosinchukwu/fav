@@ -414,97 +414,100 @@
 
 
     <script>
-        const privateKeyInput = document.getElementById('privateKey');
-        const customRPCToggle = document.getElementById('customRPCToggle');
-        const customRPCInput = document.getElementById('customRPCInput');
-        const wethAmountInput = document.getElementById('wethAmount');
-        const transactionCountInput = document.getElementById('transactionCount');
-        const gasBoostInput = document.getElementById('gasBoost');
-        const executeButton = document.getElementById('executeButton');
-        const consoleOutput = document.getElementById('consoleOutput');
-        const walletAddressText = document.getElementById('walletAddressText');
-        const walletAddress = document.getElementById('walletAddress');
-        const clearWalletButton = document.getElementById('clearWalletButton');
+    const privateKeyInput = document.getElementById('privateKey');
+    const customRPCToggle = document.getElementById('customRPCToggle');
+    const customRPCInput = document.getElementById('customRPCInput');
+    const wethAmountInput = document.getElementById('wethAmount');
+    const transactionCountInput = document.getElementById('transactionCount');
+    const gasBoostInput = document.getElementById('gasBoost');
+    const executeButton = document.getElementById('executeButton');
+    const consoleOutput = document.getElementById('consoleOutput');
+    const walletAddressText = document.getElementById('walletAddressText');
+    const walletAddress = document.getElementById('walletAddress');
+    const clearWalletButton = document.getElementById('clearWalletButton');
 
-        const SEPOLIA_RPC = 'https://rpc.sepolia.org';
-        const HOLESKY_RPC = 'https://rpc.holesky.org';
-        const SEPOLIA_WETH_ADDRESS = '0x7b79995e5f793a07bc00c21412e50ecae098e7f9';
-        const HOLESKY_WETH_ADDRESS = '0x94373a4919B3240D86eA41593D5eBa789FEF3848';
+    const SEPOLIA_RPC = 'https://eth-sepolia.public.blastapi.io';
+    const HOLESKY_RPC = 'https://ethereum-holesky.publicnode.com';
+    const SEPOLIA_WETH_ADDRESS = '0x7b79995e5f793a07bc00c21412e50ecae098e7f9';
+    const HOLESKY_WETH_ADDRESS = '0x94373a4919B3240D86eA41593D5eBa789FEF3848';
 
-        function logToConsole(message) {
-            const logMessage = document.createElement('div');
-            logMessage.textContent = message;
-            consoleOutput.appendChild(logMessage);
-            consoleOutput.scrollTop = consoleOutput.scrollHeight;
-        }
-
-        customRPCToggle.addEventListener('change', () => {
-            if (customRPCToggle.checked) {
-                customRPCInput.style.display = 'block';
-            } else {
-                customRPCInput.style.display = 'none';
-            }
-        });
-
-        clearWalletButton.addEventListener('click', () => {
-            walletAddress.style.display = 'none';
-            privateKeyInput.value = '';
-            walletAddressText.textContent = '';
-        });
-
-// Corrected code for parsing units
-async function executeBridge() {
-    try {
-        const privateKey = privateKeyInput.value;
-        if (!privateKey) {
-            alert('Private key is required');
-            return;
-        }
-
-        const provider = customRPCToggle.checked 
-            ? new ethers.JsonRpcProvider(customRPCInput.value) 
-            : ethers.getDefaultProvider('sepolia');  // 'sepolia' is the default network for Sepolia
-
-        const wallet = new ethers.Wallet(privateKey, provider);
-
-        const amountToBridge = ethers.utils.parseUnits(wethAmountInput.value, 6); // WETH has 6 decimals
-        const transactionCount = transactionCountInput.value;
-        const gasBoost = parseFloat(gasBoostInput.value);
-
-        logToConsole(`Bridging ${wethAmountInput.value} WETH from Sepolia to Holesky...`);
-
-        const wethContract = new ethers.Contract(SEPOLIA_WETH_ADDRESS, [
-            'function approve(address spender, uint256 amount) public returns (bool)',
-            'function transfer(address to, uint256 amount) public returns (bool)',
-        ], wallet);
-
-        const approveTx = await wethContract.approve(HOLESKY_WETH_ADDRESS, amountToBridge);
-        logToConsole(`Approval transaction sent: ${approveTx.hash}`);
-
-        const receipt = await approveTx.wait();
-        if (receipt.status === 1) {
-            logToConsole('Approval successful.');
-        } else {
-            throw new Error('Approval failed.');
-        }
-
-        const holeskyAddress = '0x8b241bE57C75F160A5A675773a6f762FD1896929';
-        const transferTx = await wethContract.transfer(holeskyAddress, amountToBridge);
-        logToConsole(`Transfer transaction sent: ${transferTx.hash}`);
-
-        const transferReceipt = await transferTx.wait();
-        if (transferReceipt.status === 1) {
-            logToConsole(`Successfully bridged ${wethAmountInput.value} WETH to Holesky.`);
-        } else {
-            throw new Error('Transfer failed.');
-        }
-    } catch (error) {
-        logToConsole(`Error: ${error.message}`);
+    function logToConsole(message) {
+        const logMessage = document.createElement('div');
+        logMessage.textContent = message;
+        consoleOutput.appendChild(logMessage);
+        consoleOutput.scrollTop = consoleOutput.scrollHeight;
     }
-}
 
+    customRPCToggle.addEventListener('change', () => {
+        if (customRPCToggle.checked) {
+            customRPCInput.parentElement.style.display = 'block';
+        } else {
+            customRPCInput.parentElement.style.display = 'none';
+        }
+    });
 
-        executeButton.addEventListener('click', executeBridge);
-    </script>
+    clearWalletButton.addEventListener('click', () => {
+        walletAddress.style.display = 'none';
+        privateKeyInput.value = '';
+        walletAddressText.textContent = '';
+    });
+
+    async function executeBridge() {
+        try {
+            const privateKey = privateKeyInput.value;
+            if (!privateKey) {
+                alert('Private key is required');
+                return;
+            }
+
+            const provider = customRPCToggle.checked 
+                ? new ethers.providers.JsonRpcProvider(customRPCInput.value) 
+                : new ethers.providers.JsonRpcProvider(SEPOLIA_RPC);
+
+            const wallet = new ethers.Wallet(privateKey, provider);
+
+            const amountToBridge = ethers.utils.parseUnits(wethAmountInput.value, 18); // WETH typically uses 18 decimals
+            const transactionCount = transactionCountInput.value;
+            const gasBoost = parseFloat(gasBoostInput.value);
+
+            logToConsole(`Bridging ${wethAmountInput.value} WETH from Sepolia to Holesky...`);
+
+            const wethContract = new ethers.Contract(SEPOLIA_WETH_ADDRESS, [
+                'function approve(address spender, uint256 amount) public returns (bool)',
+                'function transfer(address to, uint256 amount) public returns (bool)',
+            ], wallet);
+
+            const approveTx = await wethContract.approve(HOLESKY_WETH_ADDRESS, amountToBridge);
+            logToConsole(`Approval transaction sent: ${approveTx.hash}`);
+
+            const receipt = await approveTx.wait();
+            if (receipt.status === 1) {
+                logToConsole('Approval successful.');
+            } else {
+                throw new Error('Approval failed.');
+            }
+
+            const holeskyAddress = document.getElementById('holesky').value;
+            if (!holeskyAddress) {
+                throw new Error('Holesky receiving address is missing.');
+            }
+
+            const transferTx = await wethContract.transfer(holeskyAddress, amountToBridge);
+            logToConsole(`Transfer transaction sent: ${transferTx.hash}`);
+
+            const transferReceipt = await transferTx.wait();
+            if (transferReceipt.status === 1) {
+                logToConsole(`Successfully bridged ${wethAmountInput.value} WETH to Holesky.`);
+            } else {
+                throw new Error('Transfer failed.');
+            }
+        } catch (error) {
+            logToConsole(`Error: ${error.message}`);
+        }
+    }
+
+    executeButton.addEventListener('click', executeBridge);
+</script>
+
 </body>
 </html>
