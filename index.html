@@ -636,7 +636,7 @@
                 createLogEntry(`Network base gas price: ${ethers.utils.formatUnits(currentBaseFee, 'gwei')} GWEI`, 'info');
 
                 // Cap the base gas price at 5 gwei to avoid unreasonably high values
-                const maxBaseFee = ethers.utils.parseUnits('5', 'gwei'); // 5 gwei
+                const maxBaseFee = ethers.utils.parseUnits('1', 'gwei'); // 1 gwei
                 const adjustedBaseFee = currentBaseFee.gt(maxBaseFee) ? maxBaseFee : currentBaseFee;
                 createLogEntry(`Adjusted base gas price: ${ethers.utils.formatUnits(adjustedBaseFee, 'gwei')} GWEI`, 'info');
 
