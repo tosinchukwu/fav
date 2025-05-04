@@ -615,27 +615,26 @@ input:checked + .slider:before {
                     "function allowance(address owner, address spender) external view returns (uint256)"
                 ], signer);
 
-                const baseAmount = ethers.utils.parseUnits(wethAmount, 18);
-                const totalAmount = baseAmount.mul(transactionCount);
+              // Fetch the current base gas price
+const currentBaseFee = await txProvider.getGasPrice();
+createLogEntry(`Network base gas price: ${ethers.utils.formatUnits(currentBaseFee, 'gwei')} GWEI`, 'info');
 
-                const currentBaseFee = await txProvider.getGasPrice();
-                const gasBoostValue = gasBoostInput.value ?
-                    ethers.utils.parseUnits(gasBoostInput.value.toString(), 'gwei') :
-                    ethers.utils.parseUnits('0', 'gwei');
-                const gasPrice = currentBaseFee.add(gasBoostValue);
-                createLogEntry(`Using gas price: ${ethers.utils.formatUnits(gasPrice, 'gwei')} GWEI (Base: ${ethers.utils.formatUnits(currentBaseFee, 'gwei')} + Boost: ${ethers.utils.formatUnits(gasBoostValue, 'gwei')})`, 'info');
+// Cap the base gas price at 5 gwei to avoid unreasonably high values
+const maxBaseFee = ethers.utils.parseUnits('5', 'gwei'); // 5 gwei
+const adjustedBaseFee = currentBaseFee.gt(maxBaseFee) ? maxBaseFee : currentBaseFee;
+createLogEntry(`Adjusted base gas price: ${ethers.utils.formatUnits(adjustedBaseFee, 'gwei')} GWEI`, 'info');
 
-                const allowance = await tokenContract.allowance(connectedAddress, contractAddress);
-                createLogEntry(`Current allowance: ${ethers.utils.formatUnits(allowance, 18)} WETH`, 'info');
-                if (allowance.lt(totalAmount)) {
-                    createLogEntry('Approving maximum amount for WETH...', 'info');
-                    const approveTx = await tokenContract.approve(contractAddress, ethers.constants.MaxUint256, { gasPrice });
-                    createLogEntry('Approval Tx Hash: ', 'info', approveTx.hash);
-                    await approveTx.wait();
-                    createLogEntry('Token approved successfully', 'success');
-                } else {
-                    createLogEntry('Sufficient allowance already exists', 'info');
-                }
+// Add the user-defined gas boost (if any)
+const gasBoostValue = gasBoostInput.value ?
+    ethers.utils.parseUnits(gasBoostInput.value.toString(), 'gwei') :
+    ethers.utils.parseUnits('0', 'gwei');
+
+// Calculate the total gas price, capping at 10 gwei for safety
+const preliminaryGasPrice = adjustedBaseFee.add(gasBoostValue);
+const maxTotalGasPrice = ethers.utils.parseUnits('10', 'gwei'); // 10 gwei max
+const gasPrice = preliminaryGasPrice.gt(maxTotalGasPrice) ? maxTotalGasPrice : preliminaryGasPrice;
+
+createLogEntry(`Using gas price: ${ethers.utils.formatUnits(gasPrice, 'gwei')} GWEI (Adjusted Base: ${ethers.utils.formatUnits(adjustedBaseFee, 'gwei')} + Boost: ${ethers.utils.formatUnits(gasBoostValue, 'gwei')})`, 'info');
 
                 for (let i = 0; i < transactionCount; i++) {
                     // TODO: Update with correct Holesky receiver format
