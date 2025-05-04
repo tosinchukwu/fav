@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Union Bridge For Union</title>
+    <title>Union Bridge For LINK</title>
     <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        /* Existing styles remain unchanged */
+        /* Existing styles unchanged, included for completeness */
         .wallet-connect-btn {
             width: 100%;
             max-width: 650px;
@@ -65,7 +65,7 @@
 
         body {
             font-family: 'Lexend', sans-serif;
-            background: #FFC0CB;
+            background: #FFA500;
             color: var(--text-primary);
             line-height: 1.6;
             display: flex;
@@ -237,7 +237,7 @@
             border-radius: 10px;
             min-height: 150px;
             max-height: 300px;
-            overflow k-y: auto;
+            overflow-y: auto;
             scrollbar-width: thin;
             scrollbar-color: #2563eb #1e293b;
         }
@@ -390,7 +390,7 @@
 <body>
     <div class="header">
         <i class="fas fa-exchange-alt header-icon"></i>
-        <h1>Sepolia WETH to Holesky Bridge (Gas in ETH)</h1>
+        <h1>Sepolia LINK to Holesky Bridge (Gas in ETH)</h1>
     </div>
 
     <button class="wallet-connect-btn" id="connectWalletButton">Connect Wallet</button>
@@ -427,9 +427,9 @@
 
     <div class="input-row">
         <div class="input-group">
-            <label><i class="fas fa-coins"></i> WETH Amount</label>
+            <label><i class="fas fa-coins"></i> LINK Amount</label>
             <div class="input-wrapper">
-                <input type="number" id="wethAmount" placeholder="Enter WETH amount" step="0.0001" min="0.0001">
+                <input type="number" id="linkAmount" placeholder="Enter LINK amount" step="0.0001" min="0.0001">
             </div>
         </div>
         <div class="input-group">
@@ -447,7 +447,7 @@
         </div>
     </div>
 
-    <button class="btn" id="executeButton" disabled>Bridge WETH</button>
+    <button class="btn" id="executeButton" disabled>Bridge LINK</button>
 
     <div class="console-container">
         <div class="console-header">
@@ -460,10 +460,10 @@
     </div>
 
     <script>
-        // Configuration (placeholders, verify via app.union.build)
-        const contractAddress = '0x5FbE74A283f7954f10AA04C2eDf55578811aeb03'; // TODO: Update with correct Sepolia-to-Holesky bridge contract
-        const baseToken = '0x779877a7b0d9e8603169ddbd7836e478b4624789'; // Sepolia WETH (not LINK as in original comment)
-        const channelId = 11; // TODO: Update with correct Holesky channelId
+        // Configuration
+        const contractAddress = '0x5FbE74A283f7954f10AA04C2eDf55578811aeb03'; // TODO: Verify Sepolia-to-Holesky bridge contract via app.union.build
+        const baseToken = '0x779877A7B0D9E8603169DdbD7836e478b4624789'; // Sepolia LINK token
+        const channelId = 11; // TODO: Verify correct Holesky channelId via app.union.build
         const sepoliaChainId = '11155111'; // Sepolia chain ID
 
         const connectWalletButton = document.getElementById('connectWalletButton');
@@ -473,7 +473,7 @@
         const customRPCToggle = document.getElementById('customRPCToggle');
         const customRPCSection = document.getElementById('customRPCSection');
         const holeskyAddressInput = document.getElementById('holeskyAddress');
-        const wethAmountInput = document.getElementById('wethAmount');
+        const linkAmountInput = document.getElementById('linkAmount');
         const transactionCountInput = document.getElementById('transactionCount');
         const executeButton = document.getElementById('executeButton');
         const gasBoostInput = document.getElementById('gasBoost');
@@ -495,13 +495,11 @@
             }
 
             try {
-                // Request account access
                 const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
                 connectedAddress = accounts[0];
                 provider = new ethers.providers.Web3Provider(window.ethereum);
                 signer = provider.getSigner();
 
-                // Check network
                 const network = await provider.getNetwork();
                 if (network.chainId.toString() !== sepoliaChainId) {
                     try {
@@ -527,7 +525,6 @@
                     }
                 }
 
-                // Update UI
                 walletAddressText.textContent = `Connected: ${shortenAddress(connectedAddress)}`;
                 walletAddressDisplay.style.display = 'flex';
                 connectWalletButton.textContent = 'Wallet Connected';
@@ -536,7 +533,6 @@
                 executeButton.disabled = false;
                 createLogEntry(`Wallet connected: ${shortenAddress(connectedAddress)}`, 'success');
 
-                // Handle account and chain changes
                 window.ethereum.on('accountsChanged', (accounts) => {
                     if (accounts.length === 0) {
                         disconnectWallet();
@@ -580,7 +576,7 @@
             }
         });
 
-        // Bridge WETH with gas fees paid in ETH
+        // Bridge LINK with gas fees paid in ETH
         async function prepareBridge() {
             if (!provider || !signer) {
                 createLogEntry('Please connect your wallet first', 'error');
@@ -595,12 +591,11 @@
                     throw new Error('Invalid Holesky receiving address');
                 }
 
-                // Get WETH amount and transaction count from user input
-                const wethAmount = wethAmountInput.value;
-                if (!wethAmount || isNaN(wethAmount) || Number(wethAmount) <= 0) {
-                    throw new Error("Please provide a valid WETH amount greater than 0");
+                const linkAmount = linkAmountInput.value;
+                if (!linkAmount || isNaN(linkAmount) || Number(linkAmount) <= 0) {
+                    throw new Error("Please provide a valid LINK amount greater than 0");
                 }
-                createLogEntry(`WETH amount per transaction: ${wethAmount} WETH`, 'info');
+                createLogEntry(`LINK amount per transaction: ${linkAmount} LINK`, 'info');
 
                 const transactionCount = parseInt(transactionCountInput.value);
                 if (transactionCount <= 0) {
@@ -608,12 +603,10 @@
                 }
                 createLogEntry(`Number of transactions: ${transactionCount}`, 'info');
 
-                // Calculate baseAmount and totalAmount
-                const baseAmount = ethers.utils.parseUnits(wethAmount, 18); // Parse WETH amount with 18 decimals
+                const baseAmount = ethers.utils.parseUnits(linkAmount, 18); // LINK has 18 decimals
                 const totalAmount = baseAmount.mul(transactionCount);
-                createLogEntry(`Total WETH amount for ${transactionCount} transactions: ${ethers.utils.formatUnits(totalAmount, 18)} WETH`, 'info');
+                createLogEntry(`Total LINK amount for ${transactionCount} transactions: ${ethers.utils.formatUnits(totalAmount, 18)} LINK`, 'info');
 
-                // Use custom RPC if enabled, otherwise use wallet provider
                 let txProvider = provider;
                 if (customRPCToggle.checked) {
                     const customRPC = document.getElementById('customRPCInput').value;
@@ -633,105 +626,110 @@
                     "function balanceOf(address account) external view returns (uint256)"
                 ], signer);
 
-                // Check WETH balance
-                const wethBalance = await tokenContract.balanceOf(connectedAddress);
-                if (wethBalance.lt(totalAmount)) {
-                    throw new Error(`Insufficient WETH balance: ${ethers.utils.formatUnits(wethBalance, 18)} WETH available`);
+                // Check LINK balance
+                const linkBalance = await tokenContract.balanceOf(connectedAddress);
+                if (linkBalance.lt(totalAmount)) {
+                    throw new Error(`Insufficient LINK balance: ${ethers.utils.formatUnits(linkBalance, 18)} LINK available`);
                 }
-                createLogEntry(`WETH balance: ${ethers.utils.formatUnits(wethBalance, 18)} WETH`, 'info');
+                createLogEntry(`LINK balance: ${ethers.utils.formatUnits(linkBalance, 18)} LINK`, 'info');
 
                 // Check ETH balance for gas fees
                 const ethBalance = await provider.getBalance(connectedAddress);
                 const gasPriceEstimate = await txProvider.getGasPrice();
-                const estimatedGasPerTx = ethers.BigNumber.from('200000'); // Conservative estimate for transferAndCall
+                const estimatedGasPerTx = ethers.BigNumber.from('300000'); // Conservative estimate
                 const estimatedTotalGasCost = gasPriceEstimate.mul(estimatedGasPerTx).mul(transactionCount);
                 if (ethBalance.lt(estimatedTotalGasCost)) {
                     throw new Error(`Insufficient ETH for gas fees: ${ethers.utils.formatEther(ethBalance)} ETH available, ~${ethers.utils.formatEther(estimatedTotalGasCost)} ETH required`);
                 }
                 createLogEntry(`ETH balance for gas: ${ethers.utils.formatEther(ethBalance)} ETH`, 'info');
 
-                // Fetch and adjust the gas price
+                // Fetch and adjust gas price
                 const currentBaseFee = await txProvider.getGasPrice();
                 createLogEntry(`Network base gas price: ${ethers.utils.formatUnits(currentBaseFee, 'gwei')} GWEI`, 'info');
 
-                // Cap the base gas price at 3 gwei to avoid unreasonably high values
-                const maxBaseFee = ethers.utils.parseUnits('3', 'gwei'); // 3 gwei
+                const maxBaseFee = ethers.utils.parseUnits('3', 'gwei');
                 const adjustedBaseFee = currentBaseFee.gt(maxBaseFee) ? maxBaseFee : currentBaseFee;
                 createLogEntry(`Adjusted base gas price: ${ethers.utils.formatUnits(adjustedBaseFee, 'gwei')} GWEI`, 'info');
 
-                // Add the user-defined gas boost (if any)
                 const gasBoostValue = gasBoostInput.value ?
                     ethers.utils.parseUnits(gasBoostInput.value.toString(), 'gwei') :
                     ethers.utils.parseUnits('0', 'gwei');
 
-                // Calculate the total gas price, capping at 10 gwei for safety
                 const preliminaryGasPrice = adjustedBaseFee.add(gasBoostValue);
-                const maxTotalGasPrice = ethers.utils.parseUnits('10', 'gwei'); // 10 gwei max
+                const maxTotalGasPrice = ethers.utils.parseUnits('10', 'gwei');
                 const gasPrice = preliminaryGasPrice.gt(maxTotalGasPrice) ? maxTotalGasPrice : preliminaryGasPrice;
 
                 createLogEntry(`Using gas price: ${ethers.utils.formatUnits(gasPrice, 'gwei')} GWEI (Adjusted Base: ${ethers.utils.formatUnits(adjustedBaseFee, 'gwei')} + Boost: ${ethers.utils.formatUnits(gasBoostValue, 'gwei')})`, 'info');
 
-                // Check and approve token allowance for WETH
+                // Check and approve LINK allowance
                 const allowance = await tokenContract.allowance(connectedAddress, contractAddress);
-                createLogEntry(`Current WETH allowance: ${ethers.utils.formatUnits(allowance, 18)} WETH`, 'info');
+                createLogEntry(`Current LINK allowance: ${ethers.utils.formatUnits(allowance, 18)} LINK`, 'info');
                 if (allowance.lt(totalAmount)) {
-                    createLogEntry('Approving maximum amount for WETH...', 'info');
-                    // Estimate gas for the approve transaction
+                    createLogEntry('Approving maximum amount for LINK...', 'info');
                     const approveTxGasEstimate = await tokenContract.estimateGas.approve(contractAddress, ethers.constants.MaxUint256, { gasPrice });
-                    const gasLimit = approveTxGasEstimate.mul(110).div(100); // 110% of estimate
+                    const gasLimit = approveTxGasEstimate.mul(110).div(100);
                     const approveTx = await tokenContract.approve(contractAddress, ethers.constants.MaxUint256, { gasPrice, gasLimit });
                     createLogEntry('Approval Tx Hash: ', 'info', approveTx.hash);
                     await approveTx.wait();
-                    createLogEntry('WETH approved successfully', 'success');
+                    createLogEntry('LINK approved successfully', 'success');
                 } else {
-                    createLogEntry('Sufficient WETH allowance already exists', 'info');
+                    createLogEntry('Sufficient LINK allowance already exists', 'info');
                 }
 
                 // Execute bridge transactions
                 for (let i = 0; i < transactionCount; i++) {
-                    // TODO: Update with correct Holesky receiver format
                     const receiver = ethers.utils.hexZeroPad(holeskyAddress, 32);
-                    // TODO: Update with correct quoteToken and contractAddressParam for Holesky
-                    const quoteToken = ethers.utils.toUtf8Bytes("0x685ce6742351ae9b618f383883d6d1e0c5a31b4b");
-                    const contractAddressParam = ethers.utils.toUtf8Bytes("0x5FbE74A283f7954f10AA04C2eDf55578811aeb03");
+                    // TODO: Verify quoteToken and contractAddressParam for Holesky
+                    const quoteToken = ethers.utils.hexZeroPad('0x685ce6742351ae9b618f383883d6d1e0c5a31b4b', 32);
+                    const contractAddressParam = ethers.utils.hexZeroPad('0x5FbE74A283f7954f10AA04C2eDf55578811aeb03', 32);
                     const timeoutHeight = ethers.BigNumber.from("0xffffffffffffffff");
                     const timeoutTimestamp = 0;
                     const salt = ethers.utils.randomBytes(32);
 
                     createLogEntry(`Executing bridge transfer ${i + 1} of ${transactionCount}...`, 'info');
-                    // Estimate gas for the transferAndCall transaction
-                    const txGasEstimate = await contract.estimateGas.transferAndCall(
-                        channelId,
-                        receiver,
-                        baseToken,
-                        baseAmount,
-                        quoteToken,
-                        baseAmount,
-                        contractAddressParam,
-                        "0x",
-                        timeoutHeight,
-                        timeoutTimestamp,
-                        salt,
-                        { gasPrice }
-                    );
-                    const gasLimit = txGasEstimate.mul(110).div(100); // 110% of estimate
-                    const tx = await contract.transferAndCall(
-                        channelId,
-                        receiver,
-                        baseToken,
-                        baseAmount,
-                        quoteToken,
-                        baseAmount,
-                        contractAddressParam,
-                        "0x",
-                        timeoutHeight,
-                        timeoutTimestamp,
-                        salt,
-                        { gasPrice, gasLimit }
-                    );
-                    createLogEntry('Tx Hash: ', 'success', tx.hash);
-                    await tx.wait();
-                    createLogEntry(`Transaction ${i + 1} confirmed`, 'success');
+                    let gasLimit;
+                    try {
+                        const txGasEstimate = await contract.estimateGas.transferAndCall(
+                            channelId,
+                            receiver,
+                            baseToken,
+                            baseAmount,
+                            quoteToken,
+                            baseAmount,
+                            contractAddressParam,
+                            "0x",
+                            timeoutHeight,
+                            timeoutTimestamp,
+                            salt,
+                            { gasPrice }
+                        );
+                        gasLimit = txGasEstimate.mul(110).div(100);
+                    } catch (gasError) {
+                        createLogEntry(`Gas estimation failed: ${gasError.message}. Using manual gas limit of 300,000`, 'warning');
+                        gasLimit = ethers.BigNumber.from('300000');
+                    }
+
+                    try {
+                        const tx = await contract.transferAndCall(
+                            channelId,
+                            receiver,
+                            baseToken,
+                            baseAmount,
+                            quoteToken,
+                            baseAmount,
+                            contractAddressParam,
+                            "0x",
+                            timeoutHeight,
+                            timeoutTimestamp,
+                            salt,
+                            { gasPrice, gasLimit }
+                        );
+                        createLogEntry('Tx Hash: ', 'success', tx.hash);
+                        await tx.wait();
+                        createLogEntry(`Transaction ${i + 1} confirmed`, 'success');
+                    } catch (txError) {
+                        throw new Error(`Bridge transaction failed: ${txError.message}`);
+                    }
                 }
 
                 createLogEntry('All bridge transfers completed successfully', 'success');
@@ -739,7 +737,7 @@
                 createLogEntry(`Error: ${error.message}`, 'error');
             } finally {
                 executeButton.disabled = false;
-                executeButton.innerHTML = 'Bridge WETH';
+                executeButton.innerHTML = 'Bridge LINK';
             }
         }
 
@@ -753,7 +751,8 @@
             const typeColor = {
                 'info': '#4ade80',
                 'error': '#f87171',
-                'success': '#60a5fa'
+                'success': '#60a5fa',
+                'warning': '#facc15'
             };
 
             let messageContent = message;
@@ -762,7 +761,7 @@
                 if (message.startsWith('Approval Tx Hash:')) {
                     explorerUrl = `https://sepolia.etherscan.io/tx/${txHash}`;
                 } else {
-                    explorerUrl = `https://app.union.build/explorer/transfers/${txHash}`; // TODO: Verify for Holesky
+                    explorerUrl = `https://app.union.build/explorer/transfers/${txHash}`;
                 }
                 messageContent += ` <a href="${explorerUrl}" target="_blank">${shortenHash(txHash)}</a>`;
             }
