@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Union Bridge for LINK</title>
+    <title>Union Bridge: Sepolia LINK to Holesky</title>
     <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -25,26 +25,21 @@
             justify-content: center;
             margin-bottom: 1rem;
         }
-
         .wallet-connect-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 12px rgba(75, 0, 130, 0.4);
         }
-
         .wallet-connect-btn:active {
             transform: scale(0.98);
         }
-
         .wallet-connected {
             background-color: #6A0DAD;
             cursor: default;
         }
-
         .wallet-connected:hover {
             transform: none;
             box-shadow: none;
         }
-
         :root {
             --primary-color: #2563eb;
             --secondary-color: #10b981;
@@ -56,13 +51,11 @@
             --console-bg: #1e293b;
             --console-text: #4ade80;
         }
-
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-
         body {
             font-family: 'Lexend', sans-serif;
             background: #FFA500;
@@ -74,7 +67,6 @@
             min-height: 100vh;
             padding: 2rem;
         }
-
         .header {
             text-align: center;
             margin-bottom: 2rem;
@@ -82,27 +74,23 @@
             flex-direction: column;
             align-items: center;
         }
-
         .header-icon {
             font-size: 3.5rem;
             color: var(--primary-color);
             margin-bottom: 0.75rem;
             animation: pulse 2s infinite;
         }
-
         @keyframes pulse {
             0% { transform: scale(1); }
             50% { transform: scale(1.1); }
             100% { transform: scale(1); }
         }
-
         .header h1 {
             color: #333;
             font-weight: 700;
             font-size: 2.5rem;
             margin-bottom: 0.5rem;
         }
-
         .input-group {
             width: 100%;
             max-width: 650px;
@@ -113,23 +101,19 @@
             border-radius: 10px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.05);
         }
-
         .input-group label {
             display: block;
             margin-bottom: 0.5rem;
             font-weight: 600;
             color: #1a202c;
         }
-
         .input-group label i {
             margin-right: 0.5rem;
             color: var(--primary-color);
         }
-
         .input-wrapper {
             position: relative;
         }
-
         .input-wrapper input {
             width: 100%;
             padding: 0.875rem 1rem;
@@ -139,18 +123,15 @@
             font-family: 'Lexend', sans-serif;
             color: #1a202c;
         }
-
         .input-wrapper input:focus {
             outline: none;
             border-color: var(--primary-color);
             box-shadow: 0 0 10px rgba(37, 99, 235, 0.3);
             background-color: #f0f4ff;
         }
-
         .input-wrapper input:hover {
             border-color: var(--primary-color);
         }
-
         .wallet-address {
             font-size: 0.875rem;
             color: var(--text-secondary);
@@ -164,7 +145,6 @@
             overflow: hidden;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
-
         .wallet-address span {
             white-space: nowrap;
             overflow: hidden;
@@ -172,7 +152,6 @@
             flex: 1;
             margin-right: 0.5rem;
         }
-
         .clear-wallet-btn {
             background: none;
             border: none;
@@ -180,11 +159,9 @@
             cursor: pointer;
             transition: color 0.3s ease;
         }
-
         .clear-wallet-btn:hover {
             color: #f87171;
         }
-
         .btn {
             width: 100%;
             max-width: 650px;
@@ -201,34 +178,28 @@
             justify-content: center;
             margin-top: 1rem;
         }
-
         .btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 12px rgba(37, 99, 235, 0.4);
         }
-
         .btn:active {
             transform: scale(0.98);
         }
-
         .console-container {
             width: 100%;
             max-width: 650px;
             margin-top: 1rem;
         }
-
         .console-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 0.5rem;
         }
-
         .console-header span {
             color: var(--text-secondary);
             font-weight: 500;
         }
-
         .console {
             background-color: var(--console-bg);
             color: var(--console-text);
@@ -241,36 +212,29 @@
             scrollbar-width: thin;
             scrollbar-color: #2563eb #1e293b;
         }
-
         .console::-webkit-scrollbar {
             width: 8px;
             background-color: #1e293b;
         }
-
         .console::-webkit-scrollbar-thumb {
             background-color: #2563eb;
             border-radius: 4px;
         }
-
         .console-log {
             white-space: nowrap;
             opacity: 0;
             animation: fadeIn 0.5s forwards;
         }
-
         @keyframes fadeIn {
             to { opacity: 1; }
         }
-
         .console-log a {
             color: #1e90ff;
             text-decoration: none;
         }
-
         .console-log a:hover {
             text-decoration: underline;
         }
-
         .clear-logs-btn {
             background: none;
             border: none;
@@ -280,15 +244,12 @@
             display: flex;
             align-items: center;
         }
-
         .clear-logs-btn:hover {
             color: #f87171;
         }
-
         .clear-logs-btn i {
             margin-left: 0.3rem;
         }
-
         .advanced-toggle {
             width: 100%;
             max-width: 650px;
@@ -296,12 +257,10 @@
             align-items: center;
             margin-bottom: 1rem;
         }
-
         .advanced-toggle i {
             margin-right: 0.5rem;
             color: var(--primary-color);
         }
-
         .toggle-switch {
             position: relative;
             display: inline-block;
@@ -309,13 +268,11 @@
             height: 20px;
             margin-right: 10px;
         }
-
         .toggle-switch input {
             opacity: 0;
             width: 0;
             height: 0;
         }
-
         .slider {
             position: absolute;
             cursor: pointer;
@@ -327,7 +284,6 @@
             transition: .4s;
             border-radius: 34px;
         }
-
         .slider:before {
             position: absolute;
             content: "";
@@ -339,31 +295,25 @@
             transition: .4s;
             border-radius: 50%;
         }
-
         input:checked + .slider {
             background-color: var(--primary-color);
         }
-
         input:checked + .slider:before {
             transform: translateX(20px);
         }
-
         .input-row {
             display: flex;
             gap: 1rem;
             max-width: 650px;
             width: 100%;
         }
-
         .input-row .input-group {
             flex: 1;
         }
-
         @media (max-width: 680px) {
             body {
                 padding: 1rem;
             }
-
             .input-group,
             .btn,
             .console-container,
@@ -371,15 +321,12 @@
             .input-row {
                 max-width: 100%;
             }
-
             .input-row {
                 flex-direction: column;
             }
-
             .wallet-address {
                 flex-wrap: wrap;
             }
-
             .wallet-address span {
                 white-space: normal;
                 word-break: break-all;
@@ -421,7 +368,7 @@
     <div class="input-group">
         <label><i class="fas fa-wallet"></i> Holesky Receiving Address</label>
         <div class="input-wrapper">
-            <input type="text" id="holeskyAddress" placeholder="0x...">
+            <input type="text" id="holeskyAddress" value="0x8b241bE57C75F160A5A675773a6f762FD1896929" placeholder="0x...">
         </div>
     </div>
 
@@ -429,7 +376,7 @@
         <div class="input-group">
             <label><i class="fas fa-coins"></i> LINK Amount</label>
             <div class="input-wrapper">
-                <input type="number" id="linkAmount" placeholder="Enter LINK amount" step="0.0001" min="0.0001">
+                <input type="number" id="linkAmount" value="0.0001" placeholder="Enter LINK amount" step="0.0001" min="0.0001">
             </div>
         </div>
         <div class="input-group">
@@ -463,8 +410,10 @@
         // Configuration
         const contractAddress = '0x5FbE74A283f7954f10AA04C2eDf55578811aeb03'; // Sepolia port contract (verified via Union Explorer)
         const baseToken = '0x779877A7B0D9E8603169DdbD7836e478b4624789'; // Sepolia LINK token
-        const channelId = 11; // TODO: Verify Holesky channelId via app.union.build/explorer or Union team
+        const channelId = 11; // TODO: Verify Holesky channelId via app.union.build/explorer or @union_build
         const sepoliaChainId = '11155111'; // Sepolia chain ID
+        const suspiciousString = 'bbn168fft4g777vnf9880plpehj2fzwjkeedc0c2s389eqa3cngh4s6scetjaz';
+        const defaultRPC = 'https://eth-sepolia.public.blastapi.io'; // Reliable Sepolia RPC
 
         const connectWalletButton = document.getElementById('connectWalletButton');
         const disconnectWalletButton = document.getElementById('disconnectWalletButton');
@@ -514,7 +463,7 @@
                                 params: [{
                                     chainId: `0x${parseInt(sepoliaChainId).toString(16)}`,
                                     chainName: 'Sepolia Testnet',
-                                    rpcUrls: ['https://eth-sepolia.public.blastapi.io'],
+                                    rpcUrls: [defaultRPC],
                                     nativeCurrency: { name: 'Sepolia ETH', symbol: 'ETH', decimals: 18 },
                                     blockExplorerUrls: ['https://sepolia.etherscan.io'],
                                 }],
@@ -586,9 +535,12 @@
             executeButton.disabled = true;
             executeButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
             try {
-                const holeskyAddress = holeskyAddressInput.value;
+                const holeskyAddress = holeskyAddressInput.value.trim();
                 if (!ethers.utils.isAddress(holeskyAddress)) {
-                    throw new Error('Invalid Holesky receiving address');
+                    if (holeskyAddress === suspiciousString) {
+                        throw new Error(`Invalid Holesky address: '${suspiciousString}' is not a valid Ethereum address. Please enter a valid 0x... address.`);
+                    }
+                    throw new Error('Invalid Holesky receiving address. Must be a valid 0x... Ethereum address.');
                 }
 
                 const linkAmount = linkAmountInput.value;
@@ -609,11 +561,13 @@
 
                 let txProvider = provider;
                 if (customRPCToggle.checked) {
-                    const customRPC = document.getElementById('customRPCInput').value;
+                    const customRPC = document.getElementById('customRPCInput').value.trim();
                     if (!customRPC) {
                         throw new Error('Custom RPC URL is required when using custom RPC');
                     }
                     txProvider = new ethers.providers.JsonRpcProvider(customRPC);
+                } else {
+                    txProvider = new ethers.providers.JsonRpcProvider(defaultRPC);
                 }
 
                 const contract = new ethers.Contract(contractAddress, [
@@ -629,14 +583,14 @@
                 // Check LINK balance
                 const linkBalance = await tokenContract.balanceOf(connectedAddress);
                 if (linkBalance.lt(totalAmount)) {
-                    throw new Error(`Insufficient LINK balance: ${ethers.utils.formatUnits(linkBalance, 18)} LINK available`);
+                    throw new Error(`Insufficient LINK balance: ${ethers.utils.formatUnits(linkBalance, 18)} LINK available. Get more at faucets.chain.link/sepolia`);
                 }
                 createLogEntry(`LINK balance: ${ethers.utils.formatUnits(linkBalance, 18)} LINK`, 'info');
 
                 // Check ETH balance for gas fees
                 const ethBalance = await provider.getBalance(connectedAddress);
                 const gasPriceEstimate = await txProvider.getGasPrice();
-                const estimatedGasPerTx = ethers.BigNumber.from('300000'); // Conservative estimate
+                const estimatedGasPerTx = ethers.BigNumber.from('500000'); // Based on failed tx
                 const estimatedTotalGasCost = gasPriceEstimate.mul(estimatedGasPerTx).mul(transactionCount);
                 if (ethBalance.lt(estimatedTotalGasCost)) {
                     throw new Error(`Insufficient ETH for gas fees: ${ethers.utils.formatEther(ethBalance)} ETH available, ~${ethers.utils.formatEther(estimatedTotalGasCost)} ETH required`);
@@ -663,9 +617,9 @@
 
                 // Check and approve LINK allowance
                 const allowance = await tokenContract.allowance(connectedAddress, contractAddress);
-                createLogEntry(`Current LINK allowance: ${ethers.utils.formatUnits(allowance, 18)} LINK`, 'info');
+                createLogEntry(`Current LINK allowance for port ${contractAddress}: ${ethers.utils.formatUnits(allowance, 18)} LINK`, 'info');
                 if (allowance.lt(totalAmount)) {
-                    createLogEntry('Approving maximum amount for LINK...', 'info');
+                    createLogEntry('Approving LINK for port contract...', 'info');
                     const approveTxGasEstimate = await tokenContract.estimateGas.approve(contractAddress, ethers.constants.MaxUint256, { gasPrice });
                     const gasLimit = approveTxGasEstimate.mul(110).div(100);
                     const approveTx = await tokenContract.approve(contractAddress, ethers.constants.MaxUint256, { gasPrice, gasLimit });
@@ -679,109 +633,11 @@
                 // Execute bridge transactions
                 for (let i = 0; i < transactionCount; i++) {
                     const receiver = ethers.utils.hexZeroPad(holeskyAddress, 32);
-                    // TODO: Verify quoteToken (Holesky LINK) and contractAddressParam (Holesky port)
+                    // TODO: Verify Holesky quoteToken and contractAddressParam
                     const quoteToken = ethers.utils.hexZeroPad('0xE4E7b5aDDf001f594E7aAf44358f0a346bF6D6F6', 32); // Holesky LINK (tentative)
                     const contractAddressParam = ethers.utils.hexZeroPad('0x4B5d0fB98fC73b53eB96dE89A4e9263cb3e27e2A', 32); // Holesky port (tentative)
                     const timeoutHeight = ethers.BigNumber.from("0xffffffffffffffff");
                     const timeoutTimestamp = 0;
-                    const salt = ethers.utils.randomBytes(32);
-
-                    createLogEntry(`Executing bridge transfer ${i + 1} of ${transactionCount}...`, 'info');
-                    let gasLimit;
-                    try {
-                        const txGasEstimate = await contract.estimateGas.transferAndCall(
-                            channelId,
-                            receiver,
-                            baseToken,
-                            baseAmount,
-                            quoteToken,
-                            baseAmount,
-                            contractAddressParam,
-                            "0x",
-                            timeoutHeight,
-                            timeoutTimestamp,
-                            salt,
-                            { gasPrice }
-                        );
-                        gasLimit = txGasEstimate.mul(110).div(100);
-                    } catch (gasError) {
-                        createLogEntry(`Gas estimation failed: ${gasError.message}. Using manual gas limit of 300,000`, 'warning');
-                        gasLimit = ethers.BigNumber.from('300000');
-                    }
-
-                    try {
-                        const tx = await contract.transferAndCall(
-                            channelId,
-                            receiver,
-                            baseToken,
-                            baseAmount,
-                            quoteToken,
-                            baseAmount,
-                            contractAddressParam,
-                            "0x",
-                            timeoutHeight,
-                            timeoutTimestamp,
-                            salt,
-                            { gasPrice, gasLimit }
-                        );
-                        createLogEntry('Tx Hash: ', 'success', tx.hash);
-                        await tx.wait();
-                        createLogEntry(`Transaction ${i + 1} confirmed. Check Union Explorer: https://app.union.build/explorer/transfers/${tx.hash}`, 'success');
-                    } catch (txError) {
-                        throw new Error(`Bridge transaction failed: ${txError.message}${txError.data ? ' (Data: ' + txError.data + ')' : ''}`);
-                    }
-                }
-
-                createLogEntry('All bridge transfers completed successfully', 'success');
-            } catch (error) {
-                createLogEntry(`Error: ${error.message}${error.data ? ' (Data: ' + error.data + ')' : ''}`, 'error');
-            } finally {
-                executeButton.disabled = false;
-                executeButton.innerHTML = 'Bridge LINK';
-            }
-        }
-
-        executeButton.addEventListener('click', prepareBridge);
-
-        function createLogEntry(message, type = 'info', txHash = null) {
-            const logEntry = document.createElement('div');
-            logEntry.classList.add('console-log');
-
-            const timestamp = new Date().toLocaleTimeString();
-            const typeColor = {
-                'info': '#4ade80',
-                'error': '#f87171',
-                'success': '#60a5fa',
-                'warning': '#facc15'
-            };
-
-            let messageContent = message;
-            if (txHash && !message.includes('Union Explorer')) {
-                let explorerUrl;
-                if (message.startsWith('Approval Tx Hash:')) {
-                    explorerUrl = `https://sepolia.etherscan.io/tx/${txHash}`;
-                } else {
-                    explorerUrl = `https://app.union.build/explorer/transfers/${txHash}`;
-                }
-                messageContent += ` <a href="${explorerUrl}" target="_blank">${shortenHash(txHash)}</a>`;
-            }
-
-            logEntry.innerHTML = `
-                <span style="color: #64748b; margin-right: 0.5rem;">[${timestamp}]</span>
-                <span style="color: ${typeColor[type]}">${messageContent}</span>
-            `;
-
-            consoleOutput.appendChild(logEntry);
-            consoleOutput.scrollTop = consoleOutput.scrollHeight;
-        }
-
-        function shortenHash(hash) {
-            return `${hash.slice(0, 6)}...${hash.slice(-4)}`;
-        }
-
-        function shortenAddress(address) {
-            return `${address.slice(0, 6)}...${address.slice(-4)}`;
-        }
-    </script>
-</body>
-</html>
+                    const salt = ethers.utils.randomBytes(32); // Random salt
+                    if (suspiciousString === ethers.utils.hexlify(salt) || holeskyAddress === suspiciousString) {
+                        throw new Error(`Invalid input: '${suspiciousString}' detected. Use
