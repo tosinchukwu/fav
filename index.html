@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Union Bridge For LINK</title>
+    <title>Union Bridge for LINK</title>
     <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        /* Existing styles unchanged, included for completeness */
+        /* Previous styles unchanged for brevity */
         .wallet-connect-btn {
             width: 100%;
             max-width: 650px;
@@ -65,7 +65,7 @@
 
         body {
             font-family: 'Lexend', sans-serif;
-            background: #FFA500;
+            background: #D2691E;
             color: var(--text-primary);
             line-height: 1.6;
             display: flex;
@@ -461,9 +461,9 @@
 
     <script>
         // Configuration
-        const contractAddress = '0x5FbE74A283f7954f10AA04C2eDf55578811aeb03'; // TODO: Verify Sepolia-to-Holesky bridge contract via app.union.build
+        const contractAddress = '0x5FbE74A283f7954f10AA04C2eDf55578811aeb03'; // Sepolia port contract (verified via Union Explorer)
         const baseToken = '0x779877A7B0D9E8603169DdbD7836e478b4624789'; // Sepolia LINK token
-        const channelId = 11; // TODO: Verify correct Holesky channelId via app.union.build
+        const channelId = 11; // TODO: Verify Holesky channelId via app.union.build or Union team
         const sepoliaChainId = '11155111'; // Sepolia chain ID
 
         const connectWalletButton = document.getElementById('connectWalletButton');
@@ -679,9 +679,9 @@
                 // Execute bridge transactions
                 for (let i = 0; i < transactionCount; i++) {
                     const receiver = ethers.utils.hexZeroPad(holeskyAddress, 32);
-                    // TODO: Verify quoteToken and contractAddressParam for Holesky
-                    const quoteToken = ethers.utils.hexZeroPad('0x685ce6742351ae9b618f383883d6d1e0c5a31b4b', 32);
-                    const contractAddressParam = ethers.utils.hexZeroPad('0x5FbE74A283f7954f10AA04C2eDf55578811aeb03', 32);
+                    // TODO: Verify quoteToken (Holesky LINK) and contractAddressParam (Holesky port)
+                    const quoteToken = ethers.utils.hexZeroPad('0xE4E7b5aDDf001f594E7aAf44358f0a346bF6D6F6', 32); // Holesky LINK (tentative)
+                    const contractAddressParam = ethers.utils.hexZeroPad('0x4B5d0fB98fC73b53eB96dE89A4e9263cb3e27e2A', 32); // Holesky port (tentative)
                     const timeoutHeight = ethers.BigNumber.from("0xffffffffffffffff");
                     const timeoutTimestamp = 0;
                     const salt = ethers.utils.randomBytes(32);
@@ -728,13 +728,13 @@
                         await tx.wait();
                         createLogEntry(`Transaction ${i + 1} confirmed`, 'success');
                     } catch (txError) {
-                        throw new Error(`Bridge transaction failed: ${txError.message}`);
+                        throw new Error(`Bridge transaction failed: ${txError.message}${txError.data ? ' (Data: ' + txError.data + ')' : ''}`);
                     }
                 }
 
                 createLogEntry('All bridge transfers completed successfully', 'success');
             } catch (error) {
-                createLogEntry(`Error: ${error.message}`, 'error');
+                createLogEntry(`Error: ${error.message}${error.data ? ' (Data: ' + error.data + ')' : ''}`, 'error');
             } finally {
                 executeButton.disabled = false;
                 executeButton.innerHTML = 'Bridge LINK';
