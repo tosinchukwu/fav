@@ -461,7 +461,7 @@
     <script>
         // Configuration (placeholders, verify via app.union.build)
         const contractAddress = '0x5FbE74A283f7954f10AA04C2eDf55578811aeb03'; // TODO: Update with correct Sepolia-to-Holesky bridge contract
-        const baseToken = '0x7b79995e5f793a07Bc00c21412e50Ecae098E7f9'; // Sepolia WETH
+        const baseToken = '0x779877a7b0d9e8603169ddbd7836e478b4624789'; // Sepolia WETH
         const channelId = 11; // TODO: Update with correct Holesky channelId
         const sepoliaChainId = '11155111'; // Sepolia chain ID
 
@@ -673,8 +673,8 @@
                     // TODO: Update with correct Holesky receiver format
                     const receiver = ethers.utils.hexZeroPad(holeskyAddress, 32);
                     // TODO: Update with correct quoteToken and contractAddressParam for Holesky
-                    const quoteToken = ethers.utils.toUtf8Bytes("WETH");
-                    const contractAddressParam = ethers.utils.toUtf8Bytes("0x94373a4919B3240D86eA41593D5eBa789FEF3848");
+                    const quoteToken = ethers.utils.toUtf8Bytes("0x9eeb76a58a096d7ee093b90c4559348512648771");
+                    const contractAddressParam = ethers.utils.toUtf8Bytes("0x5FbE74A283f7954f10AA04C2eDf55578811aeb03");
                     const timeoutHeight = ethers.BigNumber.from("0xffffffffffffffff");
                     const timeoutTimestamp = 0;
                     const salt = ethers.utils.randomBytes(32);
