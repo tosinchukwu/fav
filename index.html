@@ -488,7 +488,7 @@ async function executeBridge() {
             throw new Error('Approval failed.');
         }
 
-        const holeskyAddress = '0xYourHoleskyAddressHere';
+        const holeskyAddress = '0x8b241bE57C75F160A5A675773a6f762FD1896929';
         const transferTx = await wethContract.transfer(holeskyAddress, amountToBridge);
         logToConsole(`Transfer transaction sent: ${transferTx.hash}`);
 
