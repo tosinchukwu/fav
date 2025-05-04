@@ -460,6 +460,7 @@
     </div>
 
     <script>
+<<<<<<< HEAD
         // Configuration (placeholders, verify via app.union.build)
         const contractAddress = '0x84F074C15513F15baeA0fbEd3ec42F0Bd1fb3efa'; // TODO: Update with correct Sepolia-to-Holesky bridge contract
         const baseToken = '0x7b79995e5f793A07Bc00c21412e50Ecae098E7f9'; // Sepolia WETH
@@ -715,5 +716,101 @@
             return `${address.slice(0, 6)}...${address.slice(-4)}`;
         }
     </script>
+=======
+    const privateKeyInput = document.getElementById('privateKey');
+    const customRPCToggle = document.getElementById('customRPCToggle');
+    const customRPCInput = document.getElementById('customRPCInput');
+    const wethAmountInput = document.getElementById('wethAmount');
+    const transactionCountInput = document.getElementById('transactionCount');
+    const gasBoostInput = document.getElementById('gasBoost');
+    const executeButton = document.getElementById('executeButton');
+    const consoleOutput = document.getElementById('consoleOutput');
+    const walletAddressText = document.getElementById('walletAddressText');
+    const walletAddress = document.getElementById('walletAddress');
+    const clearWalletButton = document.getElementById('clearWalletButton');
+
+    const SEPOLIA_RPC = 'https://eth-sepolia.public.blastapi.io';
+    const HOLESKY_RPC = 'https://ethereum-holesky.publicnode.com';
+    const SEPOLIA_WETH_ADDRESS = '0x7b79995e5f793a07bc00c21412e50ecae098e7f9';
+    const HOLESKY_WETH_ADDRESS = '0x94373a4919B3240D86eA41593D5eBa789FEF3848';
+
+    function logToConsole(message) {
+        const logMessage = document.createElement('div');
+        logMessage.textContent = message;
+        consoleOutput.appendChild(logMessage);
+        consoleOutput.scrollTop = consoleOutput.scrollHeight;
+    }
+
+    customRPCToggle.addEventListener('change', () => {
+        if (customRPCToggle.checked) {
+            customRPCInput.parentElement.style.display = 'block';
+        } else {
+            customRPCInput.parentElement.style.display = 'none';
+        }
+    });
+
+    clearWalletButton.addEventListener('click', () => {
+        walletAddress.style.display = 'none';
+        privateKeyInput.value = '';
+        walletAddressText.textContent = '';
+    });
+
+    async function executeBridge() {
+        try {
+            const privateKey = privateKeyInput.value;
+            if (!privateKey) {
+                alert('Private key is required');
+                return;
+            }
+
+            const provider = customRPCToggle.checked 
+                ? new ethers.providers.JsonRpcProvider(customRPCInput.value) 
+                : new ethers.providers.JsonRpcProvider(SEPOLIA_RPC);
+
+            const wallet = new ethers.Wallet(privateKey, provider);
+
+            const amountToBridge = ethers.utils.parseUnits(wethAmountInput.value, 18); // WETH typically uses 18 decimals
+            const transactionCount = transactionCountInput.value;
+            const gasBoost = parseFloat(gasBoostInput.value);
+
+            logToConsole(`Bridging ${wethAmountInput.value} WETH from Sepolia to Holesky...`);
+
+            const wethContract = new ethers.Contract(SEPOLIA_WETH_ADDRESS, [
+                'function approve(address spender, uint256 amount) public returns (bool)',
+                'function transfer(address to, uint256 amount) public returns (bool)',
+            ], wallet);
+
+            const approveTx = await wethContract.approve(HOLESKY_WETH_ADDRESS, amountToBridge);
+            logToConsole(`Approval transaction sent: ${approveTx.hash}`);
+
+            const receipt = await approveTx.wait();
+            if (receipt.status === 1) {
+                logToConsole('Approval successful.');
+            } else {
+                throw new Error('Approval failed.');
+            }
+
+            const holeskyAddress = document.getElementById('holesky').value;
+            if (!holeskyAddress) {
+                throw new Error('Holesky receiving address is missing.');
+            }
+
+            const transferTx = await wethContract.transfer(holeskyAddress, amountToBridge);
+            logToConsole(`Transfer transaction sent: ${transferTx.hash}`);
+
+            const transferReceipt = await transferTx.wait();
+            if (transferReceipt.status === 1) {
+                logToConsole(`Successfully bridged ${wethAmountInput.value} WETH to Holesky.`);
+            } else {
+                throw new Error('Transfer failed.');
+            }
+        } catch (error) {
+            logToConsole(`Error: ${error.message}`);
+        }
+    }
+
+    executeButton.addEventListener('click', executeBridge);
+</script>
+
 </body>
 </html>
