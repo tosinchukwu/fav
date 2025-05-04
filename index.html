@@ -659,7 +659,7 @@
                     createLogEntry('Approving maximum amount for WETH...', 'info');
                     // Estimate gas for the approve transaction
                     const approveTxGasEstimate = await tokenContract.estimateGas.approve(contractAddress, ethers.constants.MaxUint256, { gasPrice });
-                    const gasLimit = approveTxGasEstimate.mul(120).div(100); // 120% of estimate
+                    const gasLimit = approveTxGasEstimate.mul(110).div(100); // 110% of estimate
                     const approveTx = await tokenContract.approve(contractAddress, ethers.constants.MaxUint256, { gasPrice, gasLimit });
                     createLogEntry('Approval Tx Hash: ', 'info', approveTx.hash);
                     await approveTx.wait();
