@@ -461,8 +461,8 @@
     <script>
         // Configuration (placeholders, verify via app.union.build)
         const contractAddress = '0x5FbE74A283f7954f10AA04C2eDf55578811aeb03'; // TODO: Update with correct Sepolia-to-Holesky bridge contract
-        const baseToken = '0x779877a7b0d9e8603169ddbd7836e478b4624789'; // Sepolia WETH
-        const channelId = 11; // TODO: Update with correct Holesky channelId
+        const baseToken = '0x779877a7b0d9e8603169ddbd7836e478b4624789'; // Sepolia LINK
+        const channelId = 17000; // TODO: Update with correct Holesky channelId
         const sepoliaChainId = '11155111'; // Sepolia chain ID
 
         const connectWalletButton = document.getElementById('connectWalletButton');
@@ -636,7 +636,7 @@
                 createLogEntry(`Network base gas price: ${ethers.utils.formatUnits(currentBaseFee, 'gwei')} GWEI`, 'info');
 
                 // Cap the base gas price at 5 gwei to avoid unreasonably high values
-                const maxBaseFee = ethers.utils.parseUnits('1', 'gwei'); // 1 gwei
+                const maxBaseFee = ethers.utils.parseUnits('2', 'gwei'); // 1 gwei
                 const adjustedBaseFee = currentBaseFee.gt(maxBaseFee) ? maxBaseFee : currentBaseFee;
                 createLogEntry(`Adjusted base gas price: ${ethers.utils.formatUnits(adjustedBaseFee, 'gwei')} GWEI`, 'info');
 
@@ -645,9 +645,9 @@
                     ethers.utils.parseUnits(gasBoostInput.value.toString(), 'gwei') :
                     ethers.utils.parseUnits('0', 'gwei');
 
-                // Calculate the total gas price, capping at 10 gwei for safety
+                // Calculate the total gas price, capping at 5 gwei for safety
                 const preliminaryGasPrice = adjustedBaseFee.add(gasBoostValue);
-                const maxTotalGasPrice = ethers.utils.parseUnits('10', 'gwei'); // 10 gwei max
+                const maxTotalGasPrice = ethers.utils.parseUnits('5', 'gwei'); // 5 gwei max
                 const gasPrice = preliminaryGasPrice.gt(maxTotalGasPrice) ? maxTotalGasPrice : preliminaryGasPrice;
 
                 createLogEntry(`Using gas price: ${ethers.utils.formatUnits(gasPrice, 'gwei')} GWEI (Adjusted Base: ${ethers.utils.formatUnits(adjustedBaseFee, 'gwei')} + Boost: ${ethers.utils.formatUnits(gasBoostValue, 'gwei')})`, 'info');
