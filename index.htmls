@@ -1,0 +1,87 @@
+<!DOCTYPE html><html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Union Testnet Bridge: Holesky to Sepolia (Enhanced)</title>
+    <style>
+        body { font-family: Arial, sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; background-color: #f0f0f0; }
+        .container { text-align: center; padding: 20px; background: white; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); max-width: 500px; }
+        button { padding: 10px 20px; margin: 10px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        button:disabled { background-color: #cccccc; cursor: not-allowed; }
+        button:hover:not(:disabled) { background-color: #0056b3; }
+        input { padding: 8px; margin: 10px; width: 100px; }
+        p, a { margin: 10px 0; word-break: break-all; }
+        a { color: #007bff; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Bridge WETH: Holesky to Sepolia (Enhanced)</h1>
+        <p>Note: Ensure you have Holesky ETH and WETH from <a href="https://faucet.testnet.union.build/" target="_blank">Union Faucet</a>.</p>
+        <button id="connectWallet">Connect MetaMask</button>
+        <p id="walletStatus">Wallet not connected</p>
+        <div id="bridgeForm" style="display: none;">
+            <label for="txCount">Number of Transactions:</label>
+            <input type="number" id="txCount" min="1" value="1">
+            <label for="amount">WETH per Transaction:</label>
+            <input type="number" id="amount" step="0.0001" value="0.0001">
+            <button id="bridgeButton" disabled>Bridge Assets</button>
+            <p id="status">Status: Ready</p>
+            <p id="txLinks"></p>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+    <script>
+        const ethersProvider = new ethers.providers.Web3Provider(window.ethereum);document.getElementById("connectWallet").addEventListener("click", async () => {
+        if (window.ethereum) {
+            try {
+                const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
+                document.getElementById("walletStatus").textContent = `Connected: ${accounts[0]}`;
+                document.getElementById("bridgeForm").style.display = "block";
+                document.getElementById("bridgeButton").disabled = false;
+            } catch (err) {
+                document.getElementById("status").textContent = `Error: ${err.message}`;
+            }
+        } else {
+            document.getElementById("status").textContent = "Error: MetaMask not detected";
+        }
+    });
+
+    document.getElementById("bridgeButton").addEventListener("click", async () => {
+        const amount = parseFloat(document.getElementById("amount").value);
+        const txCount = parseInt(document.getElementById("txCount").value);
+
+        if (txCount < 1 || amount <= 0) {
+            document.getElementById("status").textContent = "Error: Invalid transaction count or amount";
+            return;
+        }
+
+        document.getElementById("status").textContent = "Status: Preparing transactions...";
+
+        try {
+            await switchToNetwork(17000); // Holesky network
+            document.getElementById("status").textContent = "Status: Connected to Holesky";
+        } catch (err) {
+            document.getElementById("status").textContent = `Error: ${err.message}`;
+        }
+    });
+
+    async function switchToNetwork(chainId) {
+        try {
+            await window.ethereum.request({
+                method: "wallet_switchEthereumChain",
+                params: [{ chainId: ethers.utils.hexValue(chainId) }]
+            });
+        } catch (error) {
+            if (error.code === 4902) {
+                document.getElementById("status").textContent = "Error: Network not supported in MetaMask.";
+            } else {
+                throw error;
+            }
+        }
+    }
+</script>
+
+</body>
+</html>
