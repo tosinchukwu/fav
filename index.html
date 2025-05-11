@@ -194,4 +194,27 @@
 
                 // Execute bridge transactions
                 for (let i = 0; i < txCount; i++) {
-                    statusText.textContent = `Status: Bridging
+                    statusText.textContent = `Status: Bridging transaction ${i + 1} of ${txCount}...`;
+                    const amountWei = ethers.utils.parseUnits(amount.toString(), 18);
+                    const bridgeTx = await bridgeContract.bridge(
+                        HOLESKY_WETH,
+                        amountWei,
+                        account,
+                        11155111
+                    );
+                    const bridgeReceipt = await bridgeTx.wait();
+                    const bridgeLink = `<a href="https://holesky.etherscan.io/tx/${bridgeTx.hash}" target="_blank">Bridge Tx ${i + 1}: ${bridgeTx.hash.slice(0, 10)}...</a>`;
+                    txLinks.innerHTML += bridgeLink + "<br>";
+                    statusText.textContent = `Status: Transaction ${i + 1} broadcasted`;
+                }
+
+                statusText.textContent = `Status: All ${txCount} transactions broadcasted! Check Sepolia explorer for receipt.`;
+                txLinks.innerHTML += `<a href="https://sepolia.etherscan.io/address/${account}" target="_blank">Check Sepolia Address</a>`;
+            } catch (error) {
+                statusText.textContent = `Error: ${error.message}`;
+                txLinks.innerHTML = "";
+            }
+        });
+    </script>
+</body>
+</html>
