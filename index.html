@@ -3,704 +3,195 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Union LINK Bridge: Sepolia to Holesky</title>
-    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <title>Union Testnet Bridge: Holesky to Sepolia</title>
     <style>
-        :root {
-            --primary-color: #2563eb;
-            --secondary-color: #10b981;
-            --background-color: #f0f4f8;
-            --card-background: #ffffff;
-            --text-primary: #0f172a;
-            --text-secondary: #334155;
-            --border-color: #cbd5e1;
-            --console-bg: #1e293b;
-            --console-text: #4ade80;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         body {
-            font-family: 'Lexend', sans-serif;
-            background: linear-gradient(135deg, #e6f2ff 0%, #d9e2ec 100%);
-            color: var(--text-primary);
-            line-height: 1.6;
+            font-family: Arial, sans-serif;
             display: flex;
-            flex-direction: column;
+            justify-content: center;
             align-items: center;
             min-height: 100vh;
-            padding: 2rem;
+            margin: 0;
+            background-color: #f0f0f0;
         }
-
-        .header {
+        .container {
             text-align: center;
-            margin-bottom: 2rem;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            max-width: 500px;
         }
-
-        .header-icon {
-            font-size: 3.5rem;
-            color: var(--primary-color);
-            margin-bottom: 0.75rem;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
-        }
-
-        .header h1 {
-            color: var(--primary-color);
-            font-weight: 700;
-            font-size: 2.5rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .input-group {
-            width: 100%;
-            max-width: 650px;
-            margin-bottom: 1.5rem;
-            position: relative;
-            background-color: #f8fafc;
-            padding: 1rem;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-        }
-
-        .input-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 600;
-            color: var(--text-secondary);
-        }
-
-        .input-group label i {
-            margin-right: 0.5rem;
-            color: var(--primary-color);
-        }
-
-        .input-wrapper {
-            position: relative;
-        }
-
-        .input-wrapper input {
-            width: 100%;
-            padding: 0.875rem 1rem;
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
-            transition: all 0.3s ease;
-            font-family: 'Lexend', sans-serif;
-        }
-
-        .input-wrapper input:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 10px rgba(37, 99, 235, 0.3);
-            background-color: #f0f4ff;
-        }
-
-        .input-wrapper input:hover {
-            border-color: var(--primary-color);
-        }
-
-        .wallet-address {
-            font-size: 0.875rem;
-            color: var(--text-secondary);
-            margin-top: 0.5rem;
-            background-color: #f1f5f9;
-            padding: 0.5rem 1rem;
-            border-radius: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            overflow: hidden;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-
-        .wallet-address span {
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            flex: 1;
-            margin-right: 0.5rem;
-        }
-
-        .clear-wallet-btn {
-            background: none;
-            border: none;
-            color: #64748b;
-            cursor: pointer;
-            transition: color 0.3s ease;
-        }
-
-        .clear-wallet-btn:hover {
-            color: #f87171;
-        }
-
-        .btn {
-            width: 100%;
-            max-width: 650px;
-            padding: 1rem;
-            background-color: var(--primary-color);
+        button {
+            padding: 10px 20px;
+            margin: 10px;
+            background-color: #007bff;
             color: white;
             border: none;
-            border-radius: 10px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: transform 0.2s ease, box-shadow 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-top: 1rem;
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(37, 99, 235, 0.4);
-        }
-
-        .btn:active {
-            transform: scale(0.98);
-        }
-
-        .connect-wallet-btn {
-            background-color: var(--secondary-color);
-        }
-
-        .connect-wallet-btn:hover {
-            box-shadow: 0 6px 12px rgba(16, 185, 129, 0.4);
-        }
-
-        .console-container {
-            width: 100%;
-            max-width: 650px;
-            margin-top: 1rem;
-        }
-
-        .console-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 0.5rem;
-        }
-
-        .console-header span {
-            color: var(--text-secondary);
-            font-weight: 500;
-        }
-
-        .console {
-            background-color: var(--console-bg);
-            color: var(--console-text);
-            font-family: 'Fira Code', monospace;
-            padding: 1rem;
-            border-radius: 10px;
-            min-height: 150px;
-            max-height: 300px;
-            overflow-y: auto;
-            scrollbar-width: thin;
-            scrollbar-color: #2563eb #1e293b;
-        }
-
-        .console::-webkit-scrollbar {
-            width: 8px;
-            background-color: #1e293b;
-        }
-
-        .console::-webkit-scrollbar-thumb {
-            background-color: #2563eb;
             border-radius: 4px;
+            cursor: pointer;
         }
-
-        .console-log {
-            white-space: nowrap;
-            opacity: 0;
-            animation: fadeIn 0.5s forwards;
+        button:hover {
+            background-color: #0056b3;
         }
-
-        @keyframes fadeIn {
-            to { opacity: 1; }
+        input {
+            padding: 8px;
+            margin: 10px;
+            width: 100px;
         }
-
-        .console-log a {
-            color: #1e90ff;
+        p, a {
+            margin: 10px 0;
+            word-break: break-all;
+        }
+        a {
+            color: #007bff;
             text-decoration: none;
         }
-
-        .console-log a:hover {
+        a:hover {
             text-decoration: underline;
-        }
-
-        .clear-logs-btn {
-            background: none;
-            border: none;
-            color: #64748b;
-            cursor: pointer;
-            transition: color 0.3s ease;
-            display: flex;
-            align-items: center;
-        }
-
-        .clear-logs-btn:hover {
-            color: #f87171;
-        }
-
-        .clear-logs-btn i {
-            margin-left: 0.3rem;
-        }
-
-        .advanced-toggle {
-            width: 100%;
-            max-width: 650px;
-            display: flex;
-            align-items: center;
-            margin-bottom: 1rem;
-        }
-
-        .advanced-toggle i {
-            margin-right: 0.5rem;
-            color: var(--primary-color);
-        }
-
-        .toggle-switch {
-            position: relative;
-            display: inline-block;
-            width: 40px;
-            height: 20px;
-            margin-right: 10px;
-        }
-
-        .toggle-switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #cbd5e1;
-            transition: .4s;
-            border-radius: 34px;
-        }
-
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 16px;
-            width: 16px;
-            left: 2px;
-            bottom: 2px;
-            background-color: white;
-            transition: .4s;
-            border-radius: 50%;
-        }
-
-        input:checked + .slider {
-            background-color: var(--primary-color);
-        }
-
-        input:checked + .slider:before {
-            transform: translateX(20px);
-        }
-
-        .input-row {
-            display: flex;
-            gap: 1rem;
-            max-width: 650px;
-            width: 100%;
-        }
-
-        .input-row .input-group {
-            flex: 1;
-        }
-
-        @media (max-width: 680px) {
-            body {
-                padding: 1rem;
-            }
-
-            .input-group,
-            .btn,
-            .console-container,
-            .advanced-toggle,
-            .input-row {
-                max-width: 100%;
-            }
-
-            .input-row {
-                flex-direction: column;
-            }
-
-            .wallet-address {
-                flex-wrap: wrap;
-            }
-
-            .wallet-address span {
-                white-space: normal;
-                word-break: break-all;
-            }
         }
     </style>
 </head>
 <body>
-    <div class="header">
-        <i class="fas fa-exchange-alt header-icon"></i>
-        <h1>LINK Bridge: Sepolia to Holesky</h1>
-    </div>
-
-    <div class="input-group">
-        <label><i class="fas fa-network-wired"></i> RPC Configuration</label>
-        <div class="advanced-toggle">
-            <i class="fas fa-cog"></i>
-            <label class="toggle-switch">
-                <input type="checkbox" id="customRPCToggle">
-                <span class="slider"></span>
-            </label>
-            Use Custom RPC
-        </div>
-        <div id="customRPCSection" style="display:none;">
-            <div class="input-wrapper">
-                <input type="text" id="customRPCInput" placeholder="Enter custom RPC URL (e.g., https://rpc.sepolia.org)">
-            </div>
+    <div class="container">
+        <h1>Bridge WETH: Holesky to Sepolia</h1>
+        <p>Note: Ensure you have Holesky ETH and WETH from <a href="https://faucet.testnet.union.build/" target="_blank">Union Faucet</a>. Check transactions on <a href="https://holesky.etherscan.io" target="_blank">Holesky Etherscan</a> and <a href="https://sepolia.etherscan.io" target="_blank">Sepolia Etherscan</a>.</p>
+        <button id="connectWallet">Connect MetaMask</button>
+        <p id="walletStatus">Wallet not connected</p>
+        <div id="bridgeForm" style="display: none;">
+            <label for="txCount">Number of Transactions:</label>
+            <input type="number" id="txCount" min="1" value="1">
+            <label for="amount">WETH per Transaction:</label>
+            <input type="number" id="amount" step="0.0001" value="0.0001">
+            <button id="bridgeButton">Bridge Assets</button>
+            <p id="status">Status: Ready</p>
+            <p id="txLinks"></p>
         </div>
     </div>
-
-    <div class="input-group">
-        <label><i class="fas fa-wallet"></i> Wallet Connection</label>
-        <button class="btn connect-wallet-btn" id="connectWalletButton">
-            <i class="fas fa-wallet"></i> Connect Wallet
-        </button>
-        <div id="walletAddress" class="wallet-address" style="display: none;">
-            <span id="walletAddressText"></span>
-            <button class="clear-wallet-btn" id="disconnectWalletButton">
-                <i class="fas fa-sign-out-alt"></i>
-            </button>
-        </div>
-    </div>
-
-    <div class="input-group">
-        <label><i class="fas fa-wallet"></i> Holesky Receiving Address</label>
-        <div class="input-wrapper">
-            <input type="text" id="holeskyAddress" placeholder="0x1234567890abcdef1234567890abcdef12345678">
-        </div>
-    </div>
-
-    <div class="input-row">
-        <div class="input-group">
-            <label><i class="fas fa-coins"></i> LINK Amount</label>
-            <div class="input-wrapper">
-                <input type="number" id="linkAmount" placeholder="Enter LINK amount" step="0.001" min="0.001">
-            </div>
-        </div>
-        <div class="input-group">
-            <label><i class="fas fa-exchange-alt"></i> Transactions</label>
-            <div class="input-wrapper">
-                <input type="number" id="transactionCount" min="1" value="1">
-            </div>
-        </div>
-    </div>
-
-    <div class="input-group">
-        <label><i class="fas fa-gas-pump"></i> Gas Boost (GWEI)</label>
-        <div class="input-wrapper">
-            <input type="number" id="gasBoost" placeholder="Boost to add to base fee (e.g., 2)" step="0.1" min="0">
-        </div>
-    </div>
-
-    <button class="btn" id="executeButton" disabled>Bridge LINK</button>
-
-    <div class="console-container">
-        <div class="console-header">
-            <span>Console Output</span>
-            <button class="clear-logs-btn" id="clearLogsButton">
-                Clear <i class="fas fa-trash"></i>
-            </button>
-        </div>
-        <div class="console" id="consoleOutput"></div>
-    </div>
-
+    <script src="https://cdn.ethers.io/lib/ethers-5.7.umd.min.js"></script>
     <script>
-        // Ensure script runs after DOM is fully loaded
-        document.addEventListener('DOMContentLoaded', () => {
-            // Placeholder addresses - REPLACE WITH ACTUAL VALUES FROM UNION DOCUMENTATION
-            const contractAddress = '0xREPLACE_WITH_UNION_BRIDGE_CONTRACT_SEPOLIA'; // Union bridge contract on Sepolia
-            const baseToken = '0x779877A7B0D9E8603169DdbD7836e478b4624789'; // LINK token on Sepolia
-            const channelId = 999; // REPLACE WITH CORRECT CHANNEL ID FOR SEPOLIA-TO-HOLESKY
+        // Constants from transfer data
+        const HOLESKY_WETH = "0x94373a4919b3240d86ea41593d5eba789fef3848";
+        const SEPOLIA_WETH = "0x1a92b29dbc16e1ba9c02973fab1f7755a2786de1";
+        const HOLESKY_CHAIN_ID = "0x4268"; // 17000
+        const SEPOLIA_CHAIN_ID = "0xaa36a7"; // 11155111
+        const UNION_BRIDGE_ADDRESS = "0x5fbe74a283f7954f10aa04c2edf55578811aeb03"; // REPLACE with actual Union bridge address
+        const WETH_ABI = [
+            "function approve(address spender, uint256 amount) public returns (bool)",
+            "function balanceOf(address account) public view returns (uint256)"
+        ];
+        // REPLACE with actual Union bridge ABI from https://testnet.union.build/ or Union Discord
+        const UNION_BRIDGE_ABI = [
+            "function bridge(address token, uint256 amount, address receiver, uint64 dstChainId) external"
+        ];
 
-            const customRPCToggle = document.getElementById('customRPCToggle');
-            const customRPCSection = document.getElementById('customRPCSection');
-            const connectWalletButton = document.getElementById('connectWalletButton');
-            const disconnectWalletButton = document.getElementById('disconnectWalletButton');
-            const walletAddressDisplay = document.getElementById('walletAddress');
-            const walletAddressText = document.getElementById('walletAddressText');
-            const holeskyAddressInput = document.getElementById('holeskyAddress');
-            const linkAmountInput = document.getElementById('linkAmount');
-            const transactionCountInput = document.getElementById('transactionCount');
-            const executeButton = document.getElementById('executeButton');
-            const gasBoostInput = document.getElementById('gasBoost');
-            const consoleOutput = document.getElementById('consoleOutput');
-            const clearLogsButton = document.getElementById('clearLogsButton');
+        // Network configurations
+        const holeskyNetwork = {
+            chainId: HOLESKY_CHAIN_ID,
+            chainName: "Holesky",
+            nativeCurrency: { name: "Holesky ETH", symbol: "holETH", decimals: 18 },
+            rpcUrls: ["https://holesky.rpc.ankr.com"],
+            blockExplorerUrls: ["https://holesky.etherscan.io"]
+        };
+        const sepoliaNetwork = {
+            chainId: SEPOLIA_CHAIN_ID,
+            chainName: "Sepolia",
+            nativeCurrency: { name: "Sepolia ETH", symbol: "sepETH", decimals: 18 },
+            rpcUrls: ["https://rpc.sepolia.org"],
+            blockExplorerUrls: ["https://sepolia.etherscan.io"]
+        };
 
-            let connectedAccount = null;
-            let provider = null;
+        // DOM elements
+        const connectWalletBtn = document.getElementById("connectWallet");
+        const bridgeButton = document.getElementById("bridgeButton");
+        const walletStatus = document.getElementById("walletStatus");
+        const statusText = document.getElementById("status");
+        const txLinks = document.getElementById("txLinks");
+        const bridgeForm = document.getElementById("bridgeForm");
+        const txCountInput = document.getElementById("txCount");
+        const amountInput = document.getElementById("amount");
 
-            // Debug: Log DOM elements to ensure they are found
-            console.log('connectWalletButton:', connectWalletButton);
-            console.log('executeButton:', executeButton);
+        let provider, signer, account;
 
-            customRPCToggle.addEventListener('change', function() {
-                customRPCSection.style.display = this.checked ? 'block' : 'none';
-            });
-
-            async function connectWallet() {
-                console.log('Connect Wallet button clicked');
-                if (!window.ethereum) {
-                    createLogEntry('MetaMask or Rabby Wallet not detected. Please install a compatible wallet.', 'error');
-                    return;
+        // Switch or add network
+        async function switchOrAddNetwork(network) {
+            try {
+                await window.ethereum.request({
+                    method: "wallet_switchEthereumChain",
+                    params: [{ chainId: network.chainId }]
+                });
+            } catch (switchError) {
+                if (switchError.code === 4902) {
+                    await window.ethereum.request({
+                        method: "wallet_addEthereumChain",
+                        params: [network]
+                    });
+                } else {
+                    throw switchError;
                 }
+            }
+        }
 
+        // Connect MetaMask
+        connectWalletBtn.addEventListener("click", async () => {
+            if (typeof window.ethereum !== "undefined") {
                 try {
-                    // Request account access
-                    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-                    connectedAccount = accounts[0];
+                    const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
+                    account = accounts[0];
+                    walletStatus.textContent = `Connected: ${account.slice(0, 6)}...${account.slice(-4)}`;
+                    connectWalletBtn.style.display = "none";
+                    bridgeForm.style.display = "block";
+
                     provider = new ethers.providers.Web3Provider(window.ethereum);
+                    signer = provider.getSigner();
 
-                    // Check current chain and switch to Sepolia if needed
-                    const chainId = await window.ethereum.request({ method: 'eth_chainId' });
-                    if (chainId !== '0xaa36a7') {
-                        try {
-                            await window.ethereum.request({
-                                method: 'wallet_switchEthereumChain',
-                                params: [{ chainId: '0xaa36a7' }], // Sepolia chain ID: 11155111
-                            });
-                        } catch (switchError) {
-                            if (switchError.code === 4902) {
-                                // Sepolia not added to wallet, attempt to add it
-                                await window.ethereum.request({
-                                    method: 'wallet_addEthereumChain',
-                                    params: [{
-                                        chainId: '0xaa36a7',
-                                        chainName: 'Sepolia Testnet',
-                                        rpcUrls: ['https://rpc.sepolia.org'],
-                                        nativeCurrency: {
-                                            name: 'Sepolia ETH',
-                                            symbol: 'ETH',
-                                            decimals: 18
-                                        },
-                                        blockExplorerUrls: ['https://sepolia.etherscan.io']
-                                    }]
-                                });
-                            } else {
-                                throw switchError;
-                            }
-                        }
-                    }
-
-                    walletAddressText.textContent = `Connected: ${connectedAccount}`;
-                    walletAddressDisplay.style.display = 'flex';
-                    connectWalletButton.style.display = 'none';
-                    executeButton.disabled = false;
-                    createLogEntry(`Wallet connected: ${connectedAccount}`, 'success');
-
-                    // Listen for account or chain changes
-                    window.ethereum.on('accountsChanged', (accounts) => {
-                        if (accounts.length === 0) {
-                            disconnectWallet();
-                        } else {
-                            connectedAccount = accounts[0];
-                            walletAddressText.textContent = `Connected: ${connectedAccount}`;
-                            createLogEntry(`Wallet changed: ${connectedAccount}`, 'info');
-                        }
-                    });
-
-                    window.ethereum.on('chainChanged', (chainId) => {
-                        if (chainId !== '0xaa36a7') {
-                            createLogEntry('Please switch to Sepolia network.', 'error');
-                            executeButton.disabled = true;
-                        } else {
-                            executeButton.disabled = false;
-                        }
-                    });
+                    await switchOrAddNetwork(holeskyNetwork);
+                    statusText.textContent = "Status: Connected to Holesky";
                 } catch (error) {
-                    createLogEntry(`Error connecting wallet: ${error.message}`, 'error');
+                    statusText.textContent = `Error: ${error.message}`;
                 }
-            }
-
-            function disconnectWallet() {
-                console.log('Disconnect Wallet button clicked');
-                connectedAccount = null;
-                provider = null;
-                walletAddressDisplay.style.display = 'none';
-                connectWalletButton.style.display = 'block';
-                executeButton.disabled = true;
-                createLogEntry('Wallet disconnected', 'info');
-            }
-
-            connectWalletButton.addEventListener('click', () => {
-                console.log('Connect Wallet button clicked');
-                connectWallet();
-            });
-
-            disconnectWalletButton.addEventListener('click', () => {
-                console.log('Disconnect Wallet button clicked');
-                disconnectWallet();
-            });
-
-            clearLogsButton.addEventListener('click', () => {
-                console.log('Clear Logs button clicked');
-                while (consoleOutput.firstChild) {
-                    consoleOutput.removeChild(consoleOutput.firstChild);
-                }
-            });
-
-            async function prepareBridge() {
-                console.log('Bridge LINK button clicked');
-                if (!connectedAccount || !provider) {
-                    createLogEntry('Please connect your wallet first.', 'error');
-                    return;
-                }
-
-                executeButton.disabled = true;
-                executeButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
-                try {
-                    const holeskyAddress = holeskyAddressInput.value;
-                    const linkAmount = linkAmountInput.value;
-                    const transactionCount = parseInt(transactionCountInput.value);
-                    let rpcProvider;
-                    if (customRPCToggle.checked) {
-                        const customRPC = document.getElementById('customRPCInput').value;
-                        if (!customRPC) {
-                            throw new Error('Custom RPC URL is required when using custom RPC');
-                        }
-                        rpcProvider = new ethers.providers.JsonRpcProvider(customRPC);
-                    } else {
-                        rpcProvider = provider; // Use wallet provider for consistency
-                    }
-
-                    const signer = provider.getSigner();
-                    createLogEntry('Initializing bridge transaction...', 'info');
-                    const abi = [
-                        "function transferAndCall(uint32 channelId, bytes memory receiver, address baseToken, uint256 baseAmount, bytes memory quoteToken, uint256 quoteAmount, bytes memory contractAddress, bytes memory contractCalldata, uint64 timeoutHeight, uint64 timeoutTimestamp, bytes32 salt) external"
-                    ];
-                    const contract = new ethers.Contract(contractAddress, abi, signer);
-
-                    const erc20Abi = [
-                        "function approve(address spender, uint256 amount) external returns (bool)",
-                        "function allowance(address owner, address spender) external view returns (uint256)"
-                    ];
-                    const tokenContract = new ethers.Contract(baseToken, erc20Abi, signer);
-                    const baseAmount = ethers.utils.parseUnits(linkAmount, 18); // LINK uses 18 decimals
-                    const totalAmount = baseAmount.mul(transactionCount);
-
-                    const currentBaseFee = await rpcProvider.getGasPrice();
-                    const gasBoostValue = gasBoostInput.value ? 
-                        ethers.utils.parseUnits(gasBoostInput.value.toString(), 'gwei') : 
-                        ethers.utils.parseUnits('0', 'gwei');
-                    const gasPrice = currentBaseFee.add(gasBoostValue);
-                    createLogEntry(`Using gas price: ${ethers.utils.formatUnits(gasPrice, 'gwei')} GWEI (Base: ${ethers.utils.formatUnits(currentBaseFee, 'gwei')} + Boost: ${ethers.utils.formatUnits(gasBoostValue, 'gwei')})`, 'info');
-                    const allowance = await tokenContract.allowance(connectedAccount, contractAddress);
-                    createLogEntry(`Current allowance: ${ethers.utils.formatUnits(allowance, 18)} LINK`, 'info');
-                    if (allowance.lt(totalAmount)) {
-                        createLogEntry('Approving maximum amount for LINK...', 'info');
-                        const approveTx = await tokenContract.approve(contractAddress, ethers.constants.MaxUint256, { gasPrice });
-                        createLogEntry('Approval Tx Hash: ', 'info', approveTx.hash);
-                        await approveTx.wait();
-                        createLogEntry('Token approved successfully', 'success');
-                    } else {
-                        createLogEntry('Sufficient allowance already exists', 'info');
-                    }
-                    for (let i = 0; i < transactionCount; i++) {
-                        const receiver = ethers.utils.hexlify(ethers.utils.toUtf8Bytes(holeskyAddress)); // Holesky address as bytes
-                        const quoteToken = ethers.utils.toUtf8Bytes("0xREPLACE_WITH_HOLESKY_QUOTE_TOKEN"); // REPLACE WITH HOLESKY QUOTE TOKEN
-                        const contractAddressParam = ethers.utils.toUtf8Bytes("0xREPLACE_WITH_HOLESKY_CONTRACT_ADDRESS"); // REPLACE WITH HOLESKY CONTRACT ADDRESS
-                        const timeoutHeight = ethers.BigNumber.from("0xffffffffffffffff");
-                        const timeoutTimestamp = 0;
-                        const salt = ethers.utils.randomBytes(32);
-
-                        createLogEntry(`Executing bridge transfer ${i + 1} of ${transactionCount}...`, 'info');
-                        const tx = await contract.transferAndCall(
-                            channelId,
-                            receiver,
-                            baseToken,
-                            baseAmount,
-                            quoteToken,
-                            baseAmount,
-                            contractAddressParam,
-                            "0x",
-                            timeoutHeight,
-                            timeoutTimestamp,
-                            salt,
-                            { gasPrice }
-                        );
-                        createLogEntry('Tx Hash: ', 'success', tx.hash);
-                        await tx.wait();
-                        createLogEntry(`Transaction ${i + 1} confirmed`, 'success');
-                    }
-
-                    createLogEntry('All bridge transfers completed successfully', 'success');
-                } catch (error) {
-                    createLogEntry(`Error: ${error.message}`, 'error');
-                } finally {
-                    executeButton.disabled = false;
-                    executeButton.innerHTML = 'Bridge LINK';
-                }
-            }
-
-            executeButton.addEventListener('click', () => {
-                console.log('Bridge LINK button clicked');
-                prepareBridge();
-            });
-
-            function createLogEntry(message, type = 'info', txHash = null) {
-                const logEntry = document.createElement('div偽  console.log('Creating log entry:', message, type, txHash);
-                logEntry.classList.add('console-log');
-                
-                const timestamp = new Date().toLocaleTimeString();
-                const typeColor = {
-                    'info': '#4ade80',
-                    'error': '#f87171',
-                    'success': '#60a5fa'
-                };
-
-                let messageContent = message;
-                if (txHash) {
-                    let explorerUrl;
-                    if (message.startsWith('Approval Tx Hash:')) {
-                        explorerUrl = `https://sepolia.etherscan.io/tx/${txHash}`;
-                    } else {
-                        explorerUrl = `https://app.union.build/explorer/transfers/${txHash}`;
-                    }
-                    messageContent += ` <a href="${explorerUrl}" target="_blank">${shortenHash(txHash)}</a>`;
-                }
-
-                logEntry.innerHTML = `
-                    <span style="color: #64748b; margin-right: 0.5rem;">[${timestamp}]</span>
-                    <span style="color: ${typeColor[type]}">${messageContent}</span>
-                `;
-
-                consoleOutput.appendChild(logEntry);
-                consoleOutput.scrollTop = consoleOutput.scrollHeight;
-            }
-
-            function shortenHash(hash) {
-                return `${hash.slice(0, 6)}...${hash.slice(-4)}`;
+            } else {
+                statusText.textContent = "Error: MetaMask not installed";
             }
         });
-    </script>
-</body>
-</html>
+
+        // Bridge assets
+        bridgeButton.addEventListener("click", async () => {
+            const txCount = parseInt(txCountInput.value);
+            const amount = parseFloat(amountInput.value);
+            if (txCount < 1 || amount <= 0) {
+                statusText.textContent = "Error: Invalid transaction count or amount";
+                return;
+            }
+
+            statusText.textContent = "Status: Initiating bridging...";
+            txLinks.innerHTML = "";
+            try {
+                // Ensure Holesky network
+                const network = await provider.getNetwork();
+                if (network.chainId !== 17000) {
+                    await switchOrAddNetwork(holeskyNetwork);
+                }
+
+                // Initialize contracts
+                const wethContract = new ethers.Contract(HOLESKY_WETH, WETH_ABI, signer);
+                const bridgeContract = new ethers.Contract(UNION_BRIDGE_ADDRESS, UNION_BRIDGE_ABI, signer);
+
+                // Check WETH balance
+                const balance = await wethContract.balanceOf(account);
+                const totalAmount = ethers.utils.parseUnits((amount * txCount).toString(), 18);
+                if (balance.lt(totalAmount)) {
+                    statusText.textContent = "Error: Insufficient WETH balance";
+                    return;
+                }
+
+                // Approve WETH
+                statusText.textContent = "Status: Approving WETH...";
+                const approveTx = await wethContract.approve(UNION_BRIDGE_ADDRESS, totalAmount);
+                const approveReceipt = await approveTx.wait();
+                const approveLink = `<a href="https://holesky.etherscan.io/tx/${approveTx.hash}" target="_blank">Approval Tx: ${approveTx.hash.slice(0, 10)}...</a>`;
+                txLinks.innerHTML += approveLink + "<br>";
+
+                // Execute bridge transactions
+                for (let i = 0; i < txCount; i++) {
+                    statusText.textContent = `Status: Bridging
