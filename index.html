@@ -31,7 +31,11 @@
             border-radius: 4px;
             cursor: pointer;
         }
-        button:hover {
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        button:hover:not(:disabled) {
             background-color: #0056b3;
         }
         input {
@@ -63,7 +67,7 @@
             <input type="number" id="txCount" min="1" value="1">
             <label for="amount">WETH per Transaction:</label>
             <input type="number" id="amount" step="0.0001" value="0.0001">
-            <button id="bridgeButton">Bridge Assets</button>
+            <button id="bridgeButton" disabled>Bridge Assets</button>
             <p id="status">Status: Ready</p>
             <p id="txLinks"></p>
         </div>
@@ -141,6 +145,7 @@
                     walletStatus.textContent = `Connected: ${account.slice(0, 6)}...${account.slice(-4)}`;
                     connectWalletBtn.style.display = "none";
                     bridgeForm.style.display = "block";
+                    bridgeButton.disabled = false; // Enable bridge button
 
                     provider = new ethers.providers.Web3Provider(window.ethereum);
                     signer = provider.getSigner();
@@ -149,14 +154,21 @@
                     statusText.textContent = "Status: Connected to Holesky";
                 } catch (error) {
                     statusText.textContent = `Error: ${error.message}`;
+                    bridgeButton.disabled = true;
                 }
             } else {
                 statusText.textContent = "Error: MetaMask not installed";
+                bridgeButton.disabled = true;
             }
         });
 
         // Bridge assets
         bridgeButton.addEventListener("click", async () => {
+            if (!provider || !signer || !account) {
+                statusText.textContent = "Error: Wallet not connected. Please connect MetaMask first.";
+                return;
+            }
+
             const txCount = parseInt(txCountInput.value);
             const amount = parseFloat(amountInput.value);
             if (txCount < 1 || amount <= 0) {
