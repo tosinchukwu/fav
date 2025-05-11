@@ -60,6 +60,7 @@
     <div class="container">
         <h1>Bridge WETH: Holesky to Sepolia</h1>
         <p>Note: Ensure you have Holesky ETH and WETH from <a href="https://faucet.testnet.union.build/" target="_blank">Union Faucet</a>. Check transactions on <a href="https://holesky.etherscan.io" target="_blank">Holesky Etherscan</a> and <a href="https://sepolia.etherscan.io" target="_blank">Sepolia Etherscan</a>.</p>
+        <p><strong>Warning:</strong> Replace UNION_BRIDGE_ADDRESS and UNION_BRIDGE_ABI with actual values from <a href="https://testnet.union.build/" target="_blank">Union Testnet</a> or Union Discord.</p>
         <button id="connectWallet">Connect MetaMask</button>
         <p id="walletStatus">Wallet not connected</p>
         <div id="bridgeForm" style="display: none;">
@@ -81,14 +82,15 @@
         }
 
         // Constants from transfer data
-        const HOLESKY_WETH = "0x94373a4919b3240d86ea41593d5eba789fef3848";
+        const HOLESKY_WETH = "0x94373a4919B3240D86ea41593D5eBa789FEF3848";
         const SEPOLIA_WETH = "0x1a92b29dbc16e1ba9c02973fab1f7755a2786de1";
         const HOLESKY_CHAIN_ID = "0x4268"; // 17000
         const SEPOLIA_CHAIN_ID = "0xaa36a7"; // 11155111
         const UNION_BRIDGE_ADDRESS = "0x5fbe74a283f7954f10aa04c2edf55578811aeb03"; // REPLACE with actual Union bridge address
         const WETH_ABI = [
             "function approve(address spender, uint256 amount) public returns (bool)",
-            "function balanceOf(address account) public view returns (uint256)"
+            "function balanceOf(address account) public view returns (uint256)",
+            "function allowance(address owner, address spender) public view returns (uint256)"
         ];
         // REPLACE with actual Union bridge ABI from https://testnet.union.build/ or Union Discord
         const UNION_BRIDGE_ABI = [
@@ -198,17 +200,35 @@
                 // Check WETH balance
                 const balance = await wethContract.balanceOf(account);
                 const totalAmount = ethers.utils.parseUnits((amount * txCount).toString(), 18);
+                const balanceEth = ethers.utils.formatUnits(balance, 18);
+                statusText.textContent = `Status: WETH balance: ${balanceEth} WETH`;
                 if (balance.lt(totalAmount)) {
-                    statusText.textContent = "Error: Insufficient WETH balance";
+                    statusText.textContent = `Error: Insufficient WETH balance (${balanceEth} < ${amount * txCount})`;
                     return;
                 }
 
-                // Approve WETH
-                statusText.textContent = "Status: Approving WETH...";
-                const approveTx = await wethContract.approve(UNION_BRIDGE_ADDRESS, totalAmount);
-                const approveReceipt = await approveTx.wait();
-                const approveLink = `<a href="https://holesky.etherscan.io/tx/${approveTx.hash}" target="_blank">Approval Tx: ${approveTx.hash.slice(0, 10)}...</a>`;
-                txLinks.innerHTML += approveLink + "<br>";
+                // Check existing allowance
+                const allowance = await wethContract.allowance(account, UNION_BRIDGE_ADDRESS);
+                const allowanceEth = ethers.utils.formatUnits(allowance, 18);
+                if (allowance.gte(totalAmount)) {
+                    statusText.textContent = `Status: Sufficient allowance (${allowanceEth} WETH)`;
+                } else {
+                    // Approve WETH
+                    statusText.textContent = "Status: Approving WETH...";
+                    try {
+                        const approveTx = await wethContract.approve(UNION_BRIDGE_ADDRESS, totalAmount, { gasLimit: 100000 });
+                        const approveReceipt = await approveTx.wait();
+                        const approveLink = `<a href="https://holesky.etherscan.io/tx/${approveTx.hash}" target="_blank">Approval Tx: ${approveTx.hash.slice(0, 10)}...</a>`;
+                        txLinks.innerHTML += approveLink + "<br>";
+                        statusText.textContent = "Status: WETH approved";
+                    } catch (approveError) {
+                        statusText.textContent = `Error: Approval failed - ${approveError.message}`;
+                        if (approveError.transactionHash) {
+                            txLinks.innerHTML = `<a href="https://holesky.etherscan.io/tx/${approveError.transactionHash}" target="_blank">Failed Approval Tx: ${approveError.transactionHash.slice(0, 10)}...</a>`;
+                        }
+                        return;
+                    }
+                }
 
                 // Execute bridge transactions
                 for (let i = 0; i < txCount; i++) {
@@ -218,7 +238,8 @@
                         HOLESKY_WETH,
                         amountWei,
                         account,
-                        11155111
+                        11155111,
+                        { gasLimit: 200000 }
                     );
                     const bridgeReceipt = await bridgeTx.wait();
                     const bridgeLink = `<a href="https://holesky.etherscan.io/tx/${bridgeTx.hash}" target="_blank">Bridge Tx ${i + 1}: ${bridgeTx.hash.slice(0, 10)}...</a>`;
@@ -230,7 +251,9 @@
                 txLinks.innerHTML += `<a href="https://sepolia.etherscan.io/address/${account}" target="_blank">Check Sepolia Address</a>`;
             } catch (error) {
                 statusText.textContent = `Error: ${error.message}`;
-                txLinks.innerHTML = "";
+                if (error.transactionHash) {
+                    txLinks.innerHTML = `<a href="https://holesky.etherscan.io/tx/${error.transactionHash}" target="_blank">Failed Tx: ${error.transactionHash.slice(0, 10)}...</a>`;
+                }
             }
         });
     </script>
