@@ -105,13 +105,6 @@
             rpcUrls: ["https://holesky.rpc.ankr.com"],
             blockExplorerUrls: ["https://holesky.etherscan.io"]
         };
-        const sepoliaNetwork = {
-            chainId: SEPOLIA_CHAIN_ID,
-            chainName: "Sepolia",
-            nativeCurrency: { name: "Sepolia ETH", symbol: "sepETH", decimals: 18 },
-            rpcUrls: ["https://rpc.sepolia.org"],
-            blockExplorerUrls: ["https://sepolia.etherscan.io"]
-        };
 
         // DOM elements
         const connectWalletBtn = document.getElementById("connectWallet");
@@ -140,7 +133,7 @@
                             params: [network]
                         });
                     } catch (addError) {
-                        statusText.textContent = `Error: Failed to add ${network.chainName} network - ${addError.message}`;
+                        statusText.textContent = `Error: Failed to add ${network.chainName} - ${addError.message}`;
                         throw addError;
                     }
                 } else {
@@ -167,6 +160,7 @@
                     await switchOrAddNetwork(holeskyNetwork);
                     statusText.textContent = "Status: Connected to Holesky";
                 } catch (error) {
+                    console.log(error);
                     statusText.textContent = `Error: ${error.message}`;
                     bridgeButton.disabled = true;
                 }
@@ -219,15 +213,17 @@
                 if (allowance.gte(totalAmount)) {
                     statusText.textContent = `Status: Sufficient allowance (${allowanceEth} WETH)`;
                 } else {
-                    // Approve WETH
+                    // Approve WETH with dynamic gas
                     statusText.textContent = "Status: Approving WETH...";
                     try {
-                        const approveTx = await wethContract.approve(UNION_BRIDGE_ADDRESS, totalAmount, { gasLimit: 100000 });
+                        const gasEstimate = await wethContract.estimateGas.approve(UNION_BRIDGE_ADDRESS, totalAmount);
+                        const approveTx = await wethContract.approve(UNION_BRIDGE_ADDRESS, totalAmount, { gasLimit: gasEstimate.mul(12).div(10) });
                         const approveReceipt = await approveTx.wait();
                         const approveLink = `<a href="https://holesky.etherscan.io/tx/${approveTx.hash}" target="_blank">Approval Tx: ${approveTx.hash.slice(0, 10)}...</a>`;
                         txLinks.innerHTML += approveLink + "<br>";
                         statusText.textContent = "Status: WETH approved";
                     } catch (approveError) {
+                        console.log(approveError);
                         statusText.textContent = `Error: Approval failed - ${approveError.message}`;
                         if (approveError.transactionHash) {
                             txLinks.innerHTML += `<br><a href="https://holesky.etherscan.io/tx/${approveError.transactionHash}" target="_blank">Failed Approval Tx: ${approveError.transactionHash.slice(0, 10)}...</a>`;
@@ -240,12 +236,13 @@
                 for (let i = 0; i < txCount; i++) {
                     statusText.textContent = `Status: Bridging transaction ${i + 1} of ${txCount}...`;
                     const amountWei = ethers.utils.parseUnits(amount.toString(), 18);
+                    const gasEstimate = await bridgeContract.estimateGas.bridge(HOLESKY_WETH, amountWei, account, 11155111);
                     const bridgeTx = await bridgeContract.bridge(
                         HOLESKY_WETH,
                         amountWei,
                         account,
                         11155111,
-                        { gasLimit: 200000 }
+                        { gasLimit: gasEstimate.mul(12).div(10) }
                     );
                     const bridgeReceipt = await bridgeTx.wait();
                     const bridgeLink = `<a href="https://holesky.etherscan.io/tx/${bridgeTx.hash}" target="_blank">Bridge Tx ${i + 1}: ${bridgeTx.hash.slice(0, 10)}...</a>`;
@@ -256,6 +253,7 @@
                 statusText.textContent = `Status: All ${txCount} transactions broadcasted! Check Sepolia explorer for receipt.`;
                 txLinks.innerHTML += `<a href="https://sepolia.etherscan.io/address/${account}" target="_blank">Check Sepolia Address</a>`;
             } catch (error) {
+                console.log(error);
                 statusText.textContent = `Error: ${error.message}`;
                 if (error.transactionHash) {
                     txLinks.innerHTML += `<br><a href="https://holesky.etherscan.io/tx/${error.transactionHash}" target="_blank">Failed Tx: ${error.transactionHash.slice(0, 10)}...</a>`;
