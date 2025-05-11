@@ -12,146 +12,191 @@
             box-sizing: border-box;
         }
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-family: 'Orbitron', 'Roboto', -apple-system, sans-serif;
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #3b5998 100%);
-            background-size: 200% 200%;
-            animation: gradientShift 15s ease infinite;
-            color: #333;
-        }
-        @keyframes gradientShift {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+            background: radial-gradient(circle at center, #0a1a3a 0%, #000 100%);
+            color: #e0e7ff;
+            overflow: hidden;
         }
 
-        /* Container with glassmorphism */
-        .container {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 16px;
-            padding: 24px;
+        /* Starry background with particles */
+        .background {
+            position: fixed;
+            top: 0;
+            left: 0;
             width: 100%;
-            max-width: 480px;
-            margin: 16px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+        .particle {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+            animation: float 20s infinite linear;
+        }
+        @keyframes float {
+            0% { transform: translateY(100vh) scale(0.5); }
+            100% { transform: translateY(-10vh) scale(1); opacity: 0; }
+        }
+
+        /* Container with futuristic styling */
+        .container {
+            background: rgba(20, 30, 60, 0.85);
+            backdrop-filter: blur(12px);
+            border-radius: 12px;
+            padding: 20px;
+            width: 100%;
+            max-width: 420px;
+            margin: 12px;
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            animation: fadeIn 0.5s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         /* Typography */
         h1 {
-            font-size: 1.8rem;
-            color: #1a2a44;
-            margin-bottom: 16px;
+            font-size: 1.6rem;
+            color: #a5b4fc;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
         p {
-            font-size: 0.9rem;
-            line-height: 1.5;
-            margin-bottom: 12px;
-            color: #4a5568;
+            font-size: 0.85rem;
+            line-height: 1.4;
+            margin-bottom: 10px;
+            color: #c7d2fe;
         }
         .warning {
-            background: #fefcbf;
-            padding: 12px;
-            border-radius: 8px;
-            color: #744210;
+            background: rgba(234, 179, 8, 0.2);
+            padding: 10px;
+            border-radius: 6px;
+            color: #fef08a;
             font-weight: 500;
+            border: 1px solid #eab308;
         }
         a {
-            color: #3b82f6;
+            color: #60a5fa;
             text-decoration: none;
             transition: color 0.2s;
         }
         a:hover {
-            color: #2563eb;
+            color: #93c5fd;
             text-decoration: underline;
         }
 
         /* Buttons */
         button {
-            padding: 12px 24px;
-            font-size: 1rem;
+            padding: 10px 20px;
+            font-size: 0.9rem;
             font-weight: 500;
             border: none;
-            border-radius: 8px;
+            border-radius: 6px;
             cursor: pointer;
             transition: all 0.3s ease;
             width: 100%;
-            max-width: 200px;
-            margin: 12px 0;
+            max-width: 180px;
+            margin: 10px 0;
+            position: relative;
+            overflow: hidden;
         }
         #connectWallet {
-            background: #10b981;
-            color: white;
+            background: linear-gradient(45deg, #10b981, #34d399);
+            color: #fff;
+            box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
         }
         #connectWallet:hover {
-            background: #059669;
+            background: linear-gradient(45deg, #059669, #10b981);
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.7);
         }
         #bridgeButton {
-            background: #3b82f6;
-            color: white;
+            background: linear-gradient(45deg, #3b82f6, #60a5fa);
+            color: #fff;
+            box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
         }
         #bridgeButton:hover:not(:disabled) {
-            background: #2563eb;
+            background: linear-gradient(45deg, #2563eb, #3b82f6);
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.7);
         }
         button:disabled {
-            background: #d1d5db;
-            color: #6b7280;
+            background: #4b5563;
+            color: #9ca3af;
             cursor: not-allowed;
+            box-shadow: none;
         }
 
         /* Inputs */
         .input-group {
-            margin: 12px 0;
+            margin: 10px 0;
             display: flex;
             flex-direction: column;
             align-items: flex-start;
         }
         label {
-            font-size: 0.9rem;
-            color: #1a2a44;
+            font-size: 0.85rem;
+            color: #a5b4fc;
             margin-bottom: 4px;
         }
         input {
-            padding: 10px;
-            font-size: 0.9rem;
-            border: 1px solid #d1d5db;
-            border-radius: 8px;
+            padding: 8px;
+            font-size: 0.85rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid #4b5563;
+            border-radius: 6px;
             width: 100%;
-            max-width: 120px;
-            transition: border-color 0.2s;
+            max-width: 100px;
+            color: #e0e7ff;
+            transition: all 0.2s;
         }
         input:focus {
             outline: none;
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            border-color: #60a5fa;
+            box-shadow: 0 0 8px rgba(96, 165, 250, 0.3);
         }
 
         /* Status and transaction links */
         #status {
-            font-size: 0.9rem;
-            padding: 12px;
-            border-radius: 8px;
-            margin: 12px 0;
+            font-size: 0.85rem;
+            padding: 10px;
+            border-radius: 6px;
+            margin: 10px 0;
+            display: flex;
+            align-items: center;
+            transition: all 0.3s ease;
         }
         #status.success {
-            background: #d1fae5;
-            color: #065f46;
+            background: rgba(16, 185, 129, 0.2);
+            color: #6ee7b7;
+            border: 1px solid #10b981;
         }
         #status.error {
-            background: #fee2e2;
-            color: #991b1b;
+            background: rgba(239, 68, 68, 0.2);
+            color: #f87171;
+            border: 1px solid #ef4444;
         }
         #status.info {
-            background: #dbeafe;
-            color: #1e3a8a;
+            background: rgba(59, 130, 246, 0.2);
+            color: #93c5fd;
+            border: 1px solid #3b82f6;
         }
+        #status:before {
+            content: 'ℹ️';
+            margin-right: 8px;
+            font-size: 1rem;
+        }
+        #status.success:before { content: '✅'; }
+        #status.error:before { content: '❌'; }
         #txLinks {
-            font-size: 0.85rem;
-            color: #4a5568;
+            font-size: 0.8rem;
+            color: #c7d2fe;
             word-break: break-all;
         }
 
@@ -162,19 +207,276 @@
                 padding: 16px;
             }
             h1 {
-                font-size: 1.5rem;
+                font-size: 1.4rem;
             }
             button {
-                padding: 10px;
-                font-size: 0.9rem;
+                padding: 8px;
+                font-size: 0.85rem;
+                max-width: 160px;
             }
             input {
-                max-width: 100px;
+                max-width: 90px;
             }
         }
     </style>
 </head>
 <body>
+    <div class="background" id="particleContainer"></div>
     <div class="container">
         <h1>Bridge WETH: Holesky to Sepolia</h1>
-        <p>Bridge Wrapped Ether (
+        <p>Bridge Wrapped Ether (WETH) from Holesky to Sepolia using the Union Testnet. Fund your wallet via <a href="https://faucet.testnet.union.build/" target="_blank">Union Faucet</a>.</p>
+        <p class="warning"><strong>Warning:</strong> Replace UNION_BRIDGE_ADDRESS and UNION_BRIDGE_ABI with actual values from <a href="https://testnet.union.build/" target="_blank">Union Testnet</a> or Union Discord.</p>
+        <button id="connectWallet">Connect MetaMask</button>
+        <p id="walletStatus">Wallet not connected</p>
+        <div id="bridgeForm" style="display: none;">
+            <div class="input-group">
+                <label for="txCount">Number of Transactions</label>
+                <input type="number" id="txCount" min="1" value="1" required>
+            </div>
+            <div class="input-group">
+                <label for="amount">WETH per Transaction</label>
+                <input type="number" id="amount" step="0.0001" value="0.0001" required>
+            </div>
+            <button id="bridgeButton" disabled>Bridge Assets</button>
+            <p id="status" class="info">Status: Ready</p>
+            <p id="txLinks"></p>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+    <script>
+        // Particle animation for background
+        const particleContainer = document.getElementById('particleContainer');
+        for (let i = 0; i < 50; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.style.width = `${Math.random() * 2 + 1}px`;
+            particle.style.height = particle.style.width;
+            particle.style.left = `${Math.random() * 100}vw`;
+            particle.style.animationDelay = `${Math.random() * 20}s`;
+            particle.style.opacity = Math.random() * 0.5 + 0.2;
+            particleContainer.appendChild(particle);
+        }
+
+        // Check if ethers is loaded
+        if (typeof ethers === 'undefined') {
+            document.getElementById('status').textContent = "Error: Ethers.js failed to load. Please refresh the page or check your internet connection.";
+            document.getElementById('status').className = 'error';
+            throw new Error("Ethers.js not loaded");
+        }
+
+        // Constants from transfer data
+        const HOLESKY_WETH = "0x94373a4919B3240D86eA41593D5eBa789FEF3848"; // Correct checksum
+        const SEPOLIA_WETH = "0x1a92b29dBc16e1bA9c02973Fab1F7755a2786DE1"; // Correct checksum
+        const HOLESKY_CHAIN_ID = "0x4268"; // 17000
+        const SEPOLIA_CHAIN_ID = "0xaa36a7"; // 11155111
+        const UNION_BRIDGE_ADDRESS = "0x5fbe74a283f7954f10aa04c2edf55578811aeb03"; // REPLACE with actual Union bridge address
+        const WETH_ABI = [
+            "function approve(address spender, uint256 amount) public returns (bool)",
+            "function balanceOf(address account) public view returns (uint256)",
+            "function allowance(address owner, address spender) public view returns (uint256)"
+        ];
+        // REPLACE with actual Union bridge ABI from https://testnet.union.build/ or Union Discord
+        const UNION_BRIDGE_ABI = [
+            "function bridge(address token, uint256 amount, address receiver, uint64 dstChainId) external"
+        ];
+
+        // Network configurations
+        const holeskyNetwork = {
+            chainId: HOLESKY_CHAIN_ID,
+            chainName: "Holesky",
+            nativeCurrency: { name: "Holesky ETH", symbol: "holETH", decimals: 18 },
+            rpcUrls: ["https://holesky.rpc.ankr.com"],
+            blockExplorerUrls: ["https://holesky.etherscan.io"]
+        };
+        const sepoliaNetwork = {
+            chainId: SEPOLIA_CHAIN_ID,
+            chainName: "Sepolia",
+            nativeCurrency: { name: "Sepolia ETH", symbol: "sepETH", decimals: 18 },
+            rpcUrls: ["https://rpc.sepolia.org"],
+            blockExplorerUrls: ["https://sepolia.etherscan.io"]
+        };
+
+        // DOM elements
+        const connectWalletBtn = document.getElementById("connectWallet");
+        const bridgeButton = document.getElementById("bridgeButton");
+        const walletStatus = document.getElementById("walletStatus");
+        const statusText = document.getElementById("status");
+        const txLinks = document.getElementById("txLinks");
+        const bridgeForm = document.getElementById("bridgeForm");
+        const txCountInput = document.getElementById("txCount");
+        const amountInput = document.getElementById("amount");
+
+        let provider, signer, account;
+
+        // Validate and normalize address
+        function validateAddress(address, context) {
+            try {
+                return ethers.utils.getAddress(address); // Returns checksummed address
+            } catch (error) {
+                statusText.textContent = `Error: Invalid ${context} address - ${error.message}`;
+                statusText.className = 'error';
+                throw error;
+            }
+        }
+
+        // Validate contract addresses
+        try {
+            validateAddress(HOLESKY_WETH, "Holesky WETH");
+            validateAddress(SEPOLIA_WETH, "Sepolia WETH");
+            validateAddress(UNION_BRIDGE_ADDRESS, "Union Bridge");
+        } catch (error) {
+            statusText.textContent = `Error: Invalid contract address - ${error.message}`;
+            statusText.className = 'error';
+            throw error;
+        }
+
+        // Switch or add network
+        async function switchOrAddNetwork(network) {
+            try {
+                await window.ethereum.request({
+                    method: "wallet_switchEthereumChain",
+                    params: [{ chainId: network.chainId }]
+                });
+            } catch (switchError) {
+                if (switchError.code === 4902) {
+                    await window.ethereum.request({
+                        method: "wallet_addEthereumChain",
+                        params: [network]
+                    });
+                } else {
+                    throw switchError;
+                }
+            }
+        }
+
+        // Connect MetaMask
+        connectWalletBtn.addEventListener("click", async () => {
+            if (typeof window.ethereum !== "undefined") {
+                try {
+                    const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
+                    account = accounts[0];
+                    walletStatus.textContent = `Connected: ${account.slice(0, 6)}...${account.slice(-4)}`;
+                    connectWalletBtn.style.display = "none";
+                    bridgeForm.style.display = "block";
+                    bridgeButton.disabled = false; // Enable bridge button
+
+                    provider = new ethers.providers.Web3Provider(window.ethereum);
+                    signer = provider.getSigner();
+
+                    await switchOrAddNetwork(holeskyNetwork);
+                    statusText.textContent = "Status: Connected to Holesky";
+                    statusText.className = 'success';
+                } catch (error) {
+                    statusText.textContent = `Error: ${error.message}`;
+                    statusText.className = 'error';
+                    bridgeButton.disabled = true;
+                }
+            } else {
+                statusText.textContent = "Error: MetaMask not installed";
+                statusText.className = 'error';
+                bridgeButton.disabled = true;
+            }
+        });
+
+        // Bridge assets
+        bridgeButton.addEventListener("click", async () => {
+            if (!provider || !signer || !account) {
+                statusText.textContent = "Error: Wallet not connected. Please connect MetaMask first.";
+                statusText.className = 'error';
+                return;
+            }
+
+            const txCount = parseInt(txCountInput.value);
+            const amount = parseFloat(amountInput.value);
+            if (txCount < 1 || amount <= 0) {
+                statusText.textContent = "Error: Invalid transaction count or amount";
+                statusText.className = 'error';
+                return;
+            }
+
+            statusText.textContent = "Status: Initiating bridging...";
+            statusText.className = 'info';
+            txLinks.innerHTML = "";
+            try {
+                // Ensure Holesky network
+                const network = await provider.getNetwork();
+                if (network.chainId !== 17000) {
+                    await switchOrAddNetwork(holeskyNetwork);
+                }
+
+                // Initialize contracts
+                const wethContract = new ethers.Contract(HOLESKY_WETH, WETH_ABI, signer);
+                const bridgeContract = new ethers.Contract(UNION_BRIDGE_ADDRESS, UNION_BRIDGE_ABI, signer);
+
+                // Check WETH balance
+                const balance = await wethContract.balanceOf(account);
+                const totalAmount = ethers.utils.parseUnits((amount * txCount).toString(), 18);
+                const balanceEth = ethers.utils.formatUnits(balance, 18);
+                statusText.textContent = `Status: WETH balance: ${balanceEth} WETH`;
+                statusText.className = 'info';
+                if (balance.lt(totalAmount)) {
+                    statusText.textContent = `Error: Insufficient WETH balance (${balanceEth} < ${amount * txCount})`;
+                    statusText.className = 'error';
+                    return;
+                }
+
+                // Check existing allowance
+                const allowance = await wethContract.allowance(account, UNION_BRIDGE_ADDRESS);
+                const allowanceEth = ethers.utils.formatUnits(allowance, 18);
+                if (allowance.gte(totalAmount)) {
+                    statusText.textContent = `Status: Sufficient allowance (${allowanceEth} WETH)`;
+                    statusText.className = 'info';
+                } else {
+                    // Approve WETH
+                    statusText.textContent = "Status: Approving WETH...";
+                    statusText.className = 'info';
+                    try {
+                        const approveTx = await wethContract.approve(UNION_BRIDGE_ADDRESS, totalAmount, { gasLimit: 100000 });
+                        const approveReceipt = await approveTx.wait();
+                        const approveLink = `<a href="https://holesky.etherscan.io/tx/${approveTx.hash}" target="_blank">Approval Tx: ${approveTx.hash.slice(0, 10)}...</a>`;
+                        txLinks.innerHTML += approveLink + "<br>";
+                        statusText.textContent = "Status: WETH approved";
+                        statusText.className = 'success';
+                    } catch (approveError) {
+                        statusText.textContent = `Error: Approval failed - ${approveError.message}`;
+                        statusText.className = 'error';
+                        if (approveError.transactionHash) {
+                            txLinks.innerHTML = `<a href="https://holesky.etherscan.io/tx/${approveError.transactionHash}" target="_blank">Failed Approval Tx: ${approveError.transactionHash.slice(0, 10)}...</a>`;
+                        }
+                        return;
+                    }
+                }
+
+                // Execute bridge transactions
+                for (let i = 0; i < txCount; i++) {
+                    statusText.textContent = `Status: Bridging transaction ${i + 1} of ${txCount}...`;
+                    statusText.className = 'info';
+                    const amountWei = ethers.utils.parseUnits(amount.toString(), 18);
+                    const bridgeTx = await bridgeContract.bridge(
+                        HOLESKY_WETH,
+                        amountWei,
+                        account,
+                        11155111,
+                        { gasLimit: 200000 }
+                    );
+                    const bridgeReceipt = await bridgeTx.wait();
+                    const bridgeLink = `<a href="https://holesky.etherscan.io/tx/${bridgeTx.hash}" target="_blank">Bridge Tx ${i + 1}: ${approveTx.hash.slice(0, 10)}...</a>`;
+                    txLinks.innerHTML += bridgeLink + "<br>";
+                    statusText.textContent = `Status: Transaction ${i + 1} broadcasted`;
+                    statusText.className = 'success';
+                }
+
+                statusText.textContent = `Status: All ${txCount} transactions broadcasted! Check Sepolia explorer for receipt.`;
+                statusText.className = 'success';
+                txLinks.innerHTML += `<a href="https://sepolia.etherscan.io/address/${account}" target="_blank">Check Sepolia Address</a>`;
+            } catch (error) {
+                statusText.textContent = `Error: ${error.message}`;
+                statusText.className = 'error';
+                if (error.transactionHash) {
+                    txLinks.innerHTML = `<a href="https://holesky.etherscan.io/tx/${error.transactionHash}" target="_blank">Failed Tx: ${error.transactionHash.slice(0, 10)}...</a>`;
+                }
+            }
+        });
+    </script>
+</body>
+</html>
