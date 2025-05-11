@@ -72,8 +72,14 @@
             <p id="txLinks"></p>
         </div>
     </div>
-    <script src="https://cdn.ethers.io/lib/ethers-5.7.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
     <script>
+        // Check if ethers is loaded
+        if (typeof ethers === 'undefined') {
+            document.getElementById('status').textContent = "Error: Ethers.js failed to load. Please refresh the page or check your internet connection.";
+            throw new Error("Ethers.js not loaded");
+        }
+
         // Constants from transfer data
         const HOLESKY_WETH = "0x94373a4919b3240d86ea41593d5eba789fef3848";
         const SEPOLIA_WETH = "0x1a92b29dbc16e1ba9c02973fab1f7755a2786de1";
