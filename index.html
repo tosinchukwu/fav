@@ -81,12 +81,32 @@
             throw new Error("Ethers.js not loaded");
         }
 
+        // CHANGE: Helper function to validate and normalize addresses
+        function validateAddress(address, name) {
+            try {
+                // Ensure address is a string, trim whitespace, and convert to lowercase
+                const cleanedAddress = String(address).trim().toLowerCase();
+                // Validate format: 0x followed by 40 hex characters
+                if (!/^0x[0-9a-f]{40}$/i.test(cleanedAddress)) {
+                    throw new Error(`Invalid format for ${name}: ${address}`);
+                }
+                // Normalize address using ethers.js
+                const normalizedAddress = ethers.utils.getAddress(cleanedAddress);
+                console.log(`Validated ${name}: ${normalizedAddress}`);
+                return normalizedAddress;
+            } catch (error) {
+                document.getElementById('status').textContent = `Error: Failed to validate ${name} - ${error.message}`;
+                throw new Error(`Invalid address for ${name}: ${error.message}`);
+            }
+        }
+
         // Constants from transfer data
-        const HOLESKY_WETH = ethers.utils.getAddress("0x94373a4919B3240D86ea41593D5eBa789FEF3848");
-        const SEPOLIA_WETH = ethers.utils.getAddress("0x1a92b29dbc16e1ba9c02973fab1f7755a2786de1");
+        // CHANGE: Use validateAddress for all addresses to ensure correctness
+        const HOLESKY_WETH = validateAddress("0x94373a4919B3240D86ea41593D5eBa789FEF3848", "Holesky WETH");
+        const SEPOLIA_WETH = validateAddress("0x1a92b29dbc16e1ba9c02973fab1f7755a2786de1", "Sepolia WETH");
         const HOLESKY_CHAIN_ID = "0x4268"; // 17000
         const SEPOLIA_CHAIN_ID = "0xaa36a7"; // 11155111
-        const UNION_BRIDGE_ADDRESS = ethers.utils.getAddress("0x5fbe74a283f7954f10aa04c2edf55578811aeb03"); // REPLACE with actual Union bridge address
+        const UNION_BRIDGE_ADDRESS = validateAddress("0x5fbe74a283f7954f10aa04c2edf55578811aeb03", "Union Bridge Address"); // REPLACE with actual Union bridge address
         const WETH_ABI = [
             "function approve(address spender, uint256 amount) public returns (bool)",
             "function balanceOf(address account) public view returns (uint256)",
@@ -157,7 +177,9 @@
                     provider = new ethers.providers.Web3Provider(window.ethereum);
                     signer = provider.getSigner();
 
-                    await switchOrAddNetwork(holeskyNetwork);
+                    await switchOrAddNetwork
+
+(holeskyNetwork);
                     statusText.textContent = "Status: Connected to Holesky";
                 } catch (error) {
                     console.log(error);
