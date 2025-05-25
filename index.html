@@ -3,291 +3,128 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Union Testnet Bridge: Holesky to Sepolia</title>
+    <title>Pharos Testnet PHRS-USDC Swap</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            background-color: #f0f0f0;
-        }
-        .container {
-            text-align: center;
-            padding: 20px;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            max-width: 500px;
-        }
-        button {
-            padding: 10px 20px;
-            margin: 10px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        button:disabled {
-            background-color: #cccccc;
-            cursor: not-allowed;
-        }
-        button:hover:not(:disabled) {
-            background-color: #0056b3;
-        }
-        input {
-            padding: 8px;
-            margin: 10px;
-            width: 100px;
-        }
-        p, a {
-            margin: 10px 0;
-            word-break: break-all;
-        }
-        a {
-            color: #007bff;
-            text-decoration: none;
-        }
-        a:hover {
-            text-decoration: underline;
-        }
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        button, input { margin: 10px; padding: 10px; }
+        #swapList { width: 300px; height: 100px; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Bridge WETH: Holesky to Sepolia</h1>
-        <p>Note: Ensure you have Holesky ETH and WETH from <a href="https://faucet.testnet.union.build/" target="_blank">Union Faucet</a>. Check transactions on <a href="https://holesky.etherscan.io" target="_blank">Holesky Etherscan</a> and <a href="https://sepolia.etherscan.io" target="_blank">Sepolia Etherscan</a>.</p>
-        <p><strong>Warning:</strong> Replace UNION_BRIDGE_ADDRESS and UNION_BRIDGE_ABI with actual values from <a href="https://testnet.union.build/" target="_blank">Union Testnet</a> or Union Discord.</p>
-        <button id="connectWallet">Connect MetaMask</button>
-        <p id="walletStatus">Wallet not connected</p>
-        <div id="bridgeForm" style="display: none;">
-            <label for="txCount">Number of Transactions:</label>
-            <input type="number" id="txCount" min="1" value="1">
-            <label for="amount">WETH per Transaction:</label>
-            <input type="number" id="amount" step="0.0001" value="0.0001">
-            <button id="bridgeButton" disabled>Bridge Assets</button>
-            <p id="status">Status: Ready</p>
-            <p id="txLinks"></p>
-        </div>
-    </div>
-    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+    <h1>PHRS to USDC Swap on Pharos Testnet</h1>
+    <button id="connectWallet">Connect Wallet</button>
+    <p>Connected Account: <span id="account"></span></p>
+    <label for="swapList">Enter Swap Amounts (PHRS, one per line):</label><br>
+    <textarea id="swapList" placeholder="1.5\n2.0\n0.5"></textarea><br>
+    <button id="swapButton" disabled>Execute Swaps</button>
+    <p id="status"></p>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/4.8.0/web3.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.2/ethers.umd.min.js"></script>
     <script>
-        // Debug window.ethereum on load
-        console.log("Initial window.ethereum:", window.ethereum);
-        console.log("window.ethereum descriptor:", Object.getOwnPropertyDescriptor(window, "ethereum"));
-
-        // Check if ethers is loaded
-        if (typeof ethers === "undefined") {
-            document.getElementById("status").textContent = "Error: Ethers.js failed to load. Please refresh or check your internet.";
-            throw new Error("Ethers.js not loaded");
-        }
-
-        // Validate and normalize addresses
-        function validateAddress(address, name) {
-            try {
-                const cleanedAddress = String(address).trim().toLowerCase();
-                if (!/^0x[0-9a-f]{40}$/i.test(cleanedAddress)) {
-                    throw new Error(`Invalid format for ${name}: ${address}`);
-                }
-                const normalizedAddress = ethers.utils.getAddress(cleanedAddress);
-                console.log(`Validated ${name}: ${normalizedAddress}`);
-                return normalizedAddress;
-            } catch (error) {
-                document.getElementById("status").textContent = `Error: Failed to validate ${name} - ${error.message}`;
-                throw error;
-            }
-        }
-
-        // Constants
-        const HOLESKY_WETH = validateAddress("0x94373a4919B3240D86ea41593D5eBa789FEF3848", "Holesky WETH");
-        const SEPOLIA_WETH = validateAddress("0x1a92b29dbc16e1ba9c02973fab1f7755a2786de1", "Sepolia WETH");
-        const HOLESKY_CHAIN_ID = "0x4268"; // 17000
-        const SEPOLIA_CHAIN_ID = "0xaa36a7"; // 11155111
-        const UNION_BRIDGE_ADDRESS = validateAddress("0x5fbe74a283f7954f10aa04c2edf55578811aeb03", "Union Bridge Address"); // REPLACE
-        const WETH_ABI = [
-            "function approve(address spender, uint256 amount) public returns (bool)",
-            "function balanceOf(address account) public view returns (uint256)",
-            "function allowance(address owner, address spender) public view returns (uint256)"
-        ];
-        const UNION_BRIDGE_ABI = [
-            "function bridge(address token, uint256 amount, address receiver, uint64 dstChainId) external"
-        ]; // REPLACE with actual ABI
-
-        // Network config
-        const holeskyNetwork = {
-            chainId: HOLESKY_CHAIN_ID,
-            chainName: "Holesky",
-            nativeCurrency: { name: "Holesky ETH", symbol: "holETH", decimals: 18 },
-            rpcUrls: ["wss://ethereum-holesky-rpc.publicnode.com"],
-            blockExplorerUrls: ["https://holesky.etherscan.io"]
+        // Pharos Testnet configuration
+        const pharosTestnet = {
+            chainId: '0x1EAF', // Example Chain ID (replace with actual Pharos Testnet Chain ID)
+            chainName: 'Pharos Testnet',
+            nativeCurrency: { name: 'PHRS', symbol: 'PHRS', decimals: 18 },
+            rpcUrls: ['https://testnet.pharosnetwork.xyz'],
+            blockExplorerUrls: ['https://explorer.pharosnetwork.xyz']
         };
 
-        // DOM elements
-        const connectWalletBtn = document.getElementById("connectWallet");
-        const bridgeButton = document.getElementById("bridgeButton");
-        const walletStatus = document.getElementById("walletStatus");
-        const statusText = document.getElementById("status");
-        const txLinks = document.getElementById("txLinks");
-        const bridgeForm = document.getElementById("bridgeForm");
-        const txCountInput = document.getElementById("txCount");
-        const amountInput = document.getElementById("amount");
+        // DEX contract addresses (replace with actual Pharos Testnet DEX addresses)
+        const ROUTER_ADDRESS = '0x...'; // e.g., Faroswap Router
+        const PHRS_ADDRESS = '0x...'; // PHRS token contract
+        const USDC_ADDRESS = '0x...'; // USDC token contract
 
-        let provider, signer, account;
+        // Uniswap V2 Router ABI (simplified)
+        const ROUTER_ABI = [
+            'function swapExactTokensForTokens(uint amountIn, uint amountOutMin, address[] path, address to, uint deadline) returns (uint[] amounts)'
+        ];
+        const ERC20_ABI = [
+            'function approve(address spender, uint256 amount) public returns (bool)'
+        ];
 
-        // Switch or add network
-        async function switchOrAddNetwork(network) {
-            try {
-                await window.ethereum.request({
-                    method: "wallet_switchEthereumChain",
-                    params: [{ chainId: network.chainId }]
-                });
-            } catch (switchError) {
-                if (switchError.code === 4902) {
+        let web3, provider, signer, account;
+
+        // Connect Wallet
+        document.getElementById('connectWallet').onclick = async () => {
+            if (window.ethereum) {
+                try {
+                    // Request account access
+                    await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    web3 = new Web3(window.ethereum);
+                    provider = new ethers.BrowserProvider(window.ethereum);
+                    signer = await provider.getSigner();
+                    account = await signer.getAddress();
+                    document.getElementById('account').innerText = account;
+
+                    // Switch to Pharos Testnet
                     try {
                         await window.ethereum.request({
-                            method: "wallet_addEthereumChain",
-                            params: [network]
+                            method: 'wallet_switchEthereumChain',
+                            params: [{ chainId: pharosTestnet.chainId }]
                         });
-                    } catch (addError) {
-                        throw new Error(`Failed to add ${network.chainName}: ${addError.message}`);
+                    } catch (switchError) {
+                        if (switchError.code === 4902) {
+                            await window.ethereum.request({
+                                method: 'wallet_addEthereumChain',
+                                params: [pharosTestnet]
+                            });
+                        }
                     }
-                } else {
-                    throw new Error(`Failed to switch to ${network.chainName}: ${switchError.message}`);
+                    document.getElementById('swapButton').disabled = false;
+                    updateStatus('Wallet connected and network set to Pharos Testnet');
+                } catch (error) {
+                    updateStatus(`Error: ${error.message}`);
                 }
+            } else {
+                updateStatus('Please install MetaMask or Rabby Wallet');
             }
-        }
+        };
 
-        // Get MetaMask provider
-        async function getMetaMaskProvider() {
-            if (typeof window.ethereum !== "undefined") {
-                if (window.ethereum.isMetaMask) {
-                    console.log("Using MetaMask provider");
-                    return window.ethereum;
-                }
-                if (window.ethereum.providers) {
-                    const metaMaskProvider = window.ethereum.providers.find((p) => p.isMetaMask);
-                    if (metaMaskProvider) {
-                        console.log("Using MetaMask from providers array");
-                        return metaMaskProvider;
-                    }
-                }
+        // Execute Multiple Swaps
+        document.getElementById('swapButton').onclick = async () => {
+            const amounts = document.getElementById('swapList').value.split('\n').filter(a => a.trim());
+            if (amounts.length === 0) {
+                updateStatus('Please enter at least one swap amount');
+                return;
             }
-            throw new Error("MetaMask not detected. Ensure MetaMask is installed and active.");
-        }
 
-        // Input validation
-        function validateInputs() {
-            const txCount = parseInt(txCountInput.value);
-            const amount = parseFloat(amountInput.value);
-            bridgeButton.disabled = !(txCount >= 1 && Number.isInteger(txCount) && amount > 0 && Number.isFinite(amount));
-        }
-        txCountInput.addEventListener("input", validateInputs);
-        amountInput.addEventListener("input", validateInputs);
-
-        // Connect MetaMask
-        connectWalletBtn.addEventListener("click", async () => {
             try {
-                const ethereum = await getMetaMaskProvider();
-                const accounts = await ethereum.request({ method: "eth_requestAccounts" });
-                account = accounts[0];
-                walletStatus.textContent = `Connected: ${account.slice(0, 6)}...${account.slice(-4)}`;
-                connectWalletBtn.style.display = "none";
-                bridgeForm.style.display = "block";
-                validateInputs(); // Enable bridge button if inputs are valid
+                const router = new ethers.Contract(ROUTER_ADDRESS, ROUTER_ABI, signer);
+                const phrsContract = new ethers.Contract(PHRS_ADDRESS, ERC20_ABI, signer);
 
-                provider = new ethers.providers.Web3Provider(ethereum);
-                signer = provider.getSigner();
+                // Approve tokens for each swap
+                for (let amount of amounts) {
+                    const amountIn = ethers.parseUnits(amount.trim(), 18); // PHRS decimals
+                    await phrsContract.approve(ROUTER_ADDRESS, amountIn);
+                }
 
-                await switchOrAddNetwork(holeskyNetwork);
-                statusText.textContent = "Status: Connected to Holesky";
+                // Perform swaps
+                const deadline = Math.floor(Date.now() / 1000) + 60 * 20; // 20 minutes from now
+                const path = [PHRS_ADDRESS, USDC_ADDRESS];
+                for (let amount of amounts) {
+                    const amountIn = ethers.parseUnits(amount.trim(), 18);
+                    const amountOutMin = 0; // Set slippage tolerance as needed
+                    const tx = await router.swapExactTokensForTokens(
+                        amountIn,
+                        amountOutMin,
+                        path,
+                        account,
+                        deadline
+                    );
+                    updateStatus(`Swap initiated for ${amount} PHRS: ${tx.hash}`);
+                    await tx.wait();
+                    updateStatus(`Swap completed for ${amount} PHRS`);
+                }
             } catch (error) {
-                console.error("Connect Wallet Error:", error, error.stack);
-                statusText.textContent = `Error: ${error.message}`;
-                bridgeButton.disabled = true;
+                updateStatus(`Error during swap: ${error.message}`);
             }
-        });
+        };
 
-        // Bridge assets
-        bridgeButton.addEventListener("click", async () => {
-            try {
-                if (!provider || !signer || !account) {
-                    throw new Error("Wallet not connected. Please connect MetaMask first.");
-                }
-
-                const txCount = parseInt(txCountInput.value);
-                const amount = parseFloat(amountInput.value);
-                if (txCount < 1 || !Number.isInteger(txCount) || amount <= 0 || !Number.isFinite(amount)) {
-                    throw new Error("Transaction count must be a positive integer and amount must be a positive number");
-                }
-
-                statusText.textContent = "Status: Initiating bridging...";
-                txLinks.innerHTML = "";
-
-                // Ensure Holesky network
-                const network = await provider.getNetwork();
-                if (network.chainId !== 17000) {
-                    await switchOrAddNetwork(holeskyNetwork);
-                }
-
-                // Initialize contracts
-                const wethContract = new ethers.Contract(HOLESKY_WETH, WETH_ABI, signer);
-                const bridgeContract = new ethers.Contract(UNION_BRIDGE_ADDRESS, UNION_BRIDGE_ABI, signer);
-
-                // Validate bridge method
-                if (typeof bridgeContract.bridge !== "function") {
-                    throw new Error("bridge method is not a function. Verify UNION_BRIDGE_ABI.");
-                }
-
-                // Check WETH balance
-                const balance = await wethContract.balanceOf(account);
-                const totalAmount = ethers.utils.parseUnits((amount * txCount).toString(), 18);
-                const balanceEth = ethers.utils.formatUnits(balance, 18);
-                statusText.textContent = `Status: WETH balance: ${balanceEth} WETH`;
-                if (balance.lt(totalAmount)) {
-                    throw new Error(`Insufficient WETH balance (${balanceEth} < ${amount * txCount})`);
-                }
-
-                // Check allowance
-                const allowance = await wethContract.allowance(account, UNION_BRIDGE_ADDRESS);
-                if (allowance.gte(totalAmount)) {
-                    statusText.textContent = `Status: Sufficient allowance (${ethers.utils.formatUnits(allowance, 18)} WETH)`;
-                } else {
-                    statusText.textContent = "Status: Approving WETH...";
-                    const gasEstimate = await wethContract.estimateGas.approve(UNION_BRIDGE_ADDRESS, totalAmount);
-                    const approveTx = await wethContract.approve(UNION_BRIDGE_ADDRESS, totalAmount, {
-                        gasLimit: gasEstimate.mul(12).div(10)
-                    });
-                    await approveTx.wait();
-                    txLinks.innerHTML += `<a href="https://holesky.etherscan.io/tx/${approveTx.hash}" target="_blank">Approval Tx: ${approveTx.hash.slice(0, 10)}...</a><br>`;
-                    statusText.textContent = "Status: WETH approved";
-                }
-
-                // Bridge transactions
-                for (let i = 0; i < txCount; i++) {
-                    statusText.textContent = `Status: Bridging transaction ${i + 1} of ${txCount}...`;
-                    const amountWei = ethers.utils.parseUnits(amount.toString(), 18);
-                    const gasEstimate = await bridgeContract.estimateGas.bridge(HOLESKY_WETH, amountWei, account, 11155111);
-                    const bridgeTx = await bridgeContract.bridge(HOLESKY_WETH, amountWei, account, 11155111, {
-                        gasLimit: gasEstimate.mul(12).div(10)
-                    });
-                    await bridgeTx.wait();
-                    txLinks.innerHTML += `<a href="https://holesky.etherscan.io/tx/${bridgeTx.hash}" target="_blank">Bridge Tx ${i + 1}: ${bridgeTx.hash.slice(0, 10)}...</a><br>`;
-                    statusText.textContent = `Status: Transaction ${i + 1} broadcasted`;
-                }
-
-                statusText.textContent = `Status: All ${txCount} transactions broadcasted! Check Sepolia explorer for receipt.`;
-                txLinks.innerHTML += `<a href="https://sepolia.etherscan.io/address/${account}" target="_blank">Check Sepolia Address</a>`;
-            } catch (error) {
-                console.error("Bridge Error:", error, error.stack);
-                statusText.textContent = `Error: ${error.message}`;
-                if (error.transactionHash) {
-                    txLinks.innerHTML += `<br><a href="https://holesky.etherscan.io/tx/${error.transactionHash}" target="_blank">Failed Tx: ${error.transactionHash.slice(0, 10)}...</a>`;
-                }
-            }
-        });
+        function updateStatus(message) {
+            document.getElementById('status').innerText = message;
+        }
     </script>
 </body>
 </html>
