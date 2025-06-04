@@ -1,7 +1,7 @@
-<!DOCTYPE html>
+<!doctype html>
 <html translate="no">
 <head>
-    <meta charset="UTF-8"/>
+    <meta charset="utf-8"/>
     <title>Testing: Pharos Testnet</title>
     <meta name="description" content="A secure and lightning-fast DEX on Pharos Network for seamless crypto trading."/>
     <link rel="shortcut icon" type="image/jpg" href="/favicon.svg"/>
@@ -9,7 +9,7 @@
     <link rel="apple-touch-icon" sizes="512x512" href="/images/512x512_App_Icon.png"/>
     <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
     <meta name="theme-color" content="#fff"/>
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' 'wasm-unsafe-eval' data: https://translate.googleapis.com/ https://vercel.com https://vercel.live/ https://www.google-analytics.com https://www.googletagmanager.com https://challenges.cloudflare.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' 'unsafe-eval'; img-src * 'self' blob: data: https://assets.coingecko.com/ https://cdn.center.app/ https://ethereum-optimism.github.io/ https://explorer-api.walletconnect.com/ https://i.seadn.io/ https://lh3.googleusercontent.com/ https://openseauserdata.com/ https://raw.githubusercontent.com/ https://raw.seadn.io/ https://s2.coinmarketcap.com/ https://static.optimism.io/ https://vercel.com https://vercel.live/ https://trustwallet.com/ https://cloudflare-ipfs.com/ https://challenges.cloudflare.com; frame-src 'self' https://buy.moonpay.com/ https://vercel.com https://vercel.live/ https://verify.walletconnect.com/ https://verify.walletconnect.org/ https://challenges.cloudflare.com; connect-src * 'self' blob: data: https://statsigapi.net https://api.moonpay.com/ https://api.opensea.io https://api.thegraph.com/ https://arbitrum-mainnet.infura.io/ https://avalanche-mainnet.infura.io/ https://base-mainnet.infura.io/ https://bridge.arbitrum.io https://celo-org.github.io https://cloudflare-ipfs.com https://explorer-api.walletconnect.com https://forno.celo.org/ https://gateway.ipfs.io/ https://mainnet.infura.io https://o1037921.ingest.sentry.io https://old-wispy-arrow.bsc.quiknode.pro/ https://optimism-mainnet.infura.io/ https://polygon-mainnet.infura.io/ https://raw.githubusercontent.com https://static.optimism.io https://tokenlist.arbitrum.io/ https://tokens.coingecko.com https://ultra-blue-flower.quiknode.pro https://vercel.com https://vercel.live/ https://www.gemini.com wss://relay.walletconnect.com/ wss://www.walletlink.org/rpc https://challenges.cloudflare.com https://rpc.testnet.pharosnetwork.xyz; worker-src 'self' blob:;"/>
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' 'wasm-unsafe-eval' data: https://translate.googleapis.com/ https://vercel.com https://vercel.live/ https://www.google-analytics.com https://www.googletagmanager.com https://challenges.cloudflare.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' 'unsafe-eval'; img-src * 'self' blob: data: https://assets.coingecko.com/ https://cdn.center.app/ https://ethereum-optimism.github.io/ https://explorer-api.walletconnect.com/ https://i.seadn.io/ https://lh3.googleusercontent.com/ https://openseauserdata.com/ https://raw.githubusercontent.com/ https://raw.seadn.io/ https://s2.coinmarketcap.com/ https://static.optimism.io/ https://vercel.com https://vercel.live/ https://trustwallet.com/ https://cloudflare-ipfs.com/ https://challenges.cloudflare.com; frame-src 'self' https://buy.moonpay.com/ https://vercel.com https://vercel.live/ https://verify.walletconnect.com/ https://verify.walletconnect.org/ https://challenges.cloudflare.com; connect-src * 'self' blob: data: https://statsigapi.net https://api.moonpay.com/ https://api.opensea.io https://api.thegraph.com/ https://arbitrum-mainnet.infura.io/ https://avalanche-mainnet.infura.io/ https://base-mainnet.infura.io/ https://bridge.arbitrum.io https://celo-org.github.io https://cloudflare-ipfs.com https://explorer-api.walletconnect.com https://forno.celo.org/ https://gateway.ipfs.io/ https://mainnet.infura.io https://o1037921.ingest.sentry.io https://old-wispy-arrow.bsc.quiknode.pro/ https://optimism-mainnet.infura.io/ https://polygon-mainnet.infura.io/ https://raw.githubusercontent.com https://static.optimism.io https://tokenlist.arbitrum.io https://tokens.coingecko.com https://ultra-blue-flower.quiknode.pro https://vercel.com https://vercel.live/ https://www.gemini.com wss://relay.walletconnect.com/ wss://www.walletlink.org/rpc https://challenges.cloudflare.com https://rpc.testnet.pharosnetwork.xyz; worker-src 'self' blob:;"/>
     <meta name="apple-itunes-app" content="app-id=6443944476"/>
     <link rel="manifest" href="/manifest.json"/>
     <link rel="preconnect" href="https://main-subgraph.__HOST__.com/" crossorigin/>
@@ -148,10 +148,6 @@
             font-size: 14px;
             color: #333;
         }
-        .network-status {
-            font-size: 12px;
-            color: #666;
-        }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/web3@1.8.0/dist/web3.min.js"></script>
     <script defer="defer" src="/static/js/880.2082fd26.js"></script>
@@ -168,15 +164,12 @@
     <div id="root">
         <div class="swap-container">
             <h2>Swap on Pharos Testnet</h2>
-            <div id="balance" class="status">Balance: Not connected</div>
-            <div id="txnCount" class="status">Total Transactions: 0</div>
-            <div id="networkStatus" class="network-status">Network: Disconnected</div>
             <button id="connectWallet">Connect Wallet</button>
             <select id="token1">
                 <option value="0x76aaada469d23216be5f7c596fa25f282ff9b364">WPHRS</option>
                 <option value="0xad902cf99c2de2f1ba5ec4d642fd7e49cae9ee37">USDT</option>
             </select>
-            <input type="number" id="amount1" placeholder="Amount to swap" min="0.0001" step="0.0001"/>
+            <input type="number" id="amount1" placeholder="Amount to swap" min="0" step="0.01"/>
             <select id="token2">
                 <option value="0xad902cf99c2de2f1ba5ec4d642fd7e49cae9ee37">USDT</option>
                 <option value="0x76aaada469d23216be5f7c596fa25f282ff9b364">WPHRS</option>
@@ -185,7 +178,6 @@
             <button id="approveButton" disabled>Approve Tokens</button>
             <button id="swapButton" disabled>Swap Tokens</button>
             <div id="status" class="status">Please connect your wallet to start swapping.</div>
-            <div id="txnLinks" class="status"></div>
         </div>
     </div>
     <div id="background-radial-gradient"></div>
@@ -219,7 +211,7 @@
             }
         ];
 
-        // ERC-20 ABI for token approval, allowance, and balance
+        // ERC-20 ABI for token approval and allowance
         const erc20ABI = [
             {
                 "constant": false,
@@ -242,148 +234,35 @@
                 "outputs": [{ "name": "", "type": "uint256" }],
                 "stateMutability": "view",
                 "type": "function"
-            },
-            {
-                "constant": true,
-                "inputs": [{ "name": "_owner", "type": "address" }],
-                "name": "balanceOf",
-                "outputs": [{ "name": "", "type": "uint256" }],
-                "stateMutability": "view",
-                "type": "function"
             }
         ];
 
-        let web3, accounts, swapContract, totalTxnCount = 0, isApproved = false;
-
-        // Revert reason decoder
-        function decodeRevertReason(errorData) {
-            if (!errorData || !errorData.startsWith('0x08c379a0')) return 'Unknown revert reason';
-            const messageHex = errorData.slice(74);
-            try {
-                return web3.utils.hexToUtf8('0x' + messageHex);
-            } catch {
-                return 'Error decoding revert reason';
-            }
-        }
-
-        function updateTxnCount() {
-            document.getElementById('txnCount').textContent = `Total Transactions: ${totalTxnCount}`;
-        }
-
-        async function updateBalance() {
-            if (!web3 || !accounts || accounts.length === 0) {
-                document.getElementById('balance').textContent = 'Balance: Not connected';
-                return;
-            }
-            const token1 = document.getElementById('token1').value;
-            try {
-                const tokenContract = new web3.eth.Contract(erc20ABI, web3.utils.toChecksumAddress(token1));
-                const balance = await tokenContract.methods.balanceOf(accounts[0]).call();
-                const balanceInEther = web3.utils.fromWei(balance, 'ether');
-                document.getElementById('balance').textContent = `Balance: ${parseFloat(balanceInEther).toFixed(6)} ${token1 === '0x76aaada469d23216be5f7c596fa25f282ff9b364' ? 'WPHRS' : 'USDT'}`;
-            } catch (error) {
-                document.getElementById('balance').textContent = 'Balance: Error fetching balance';
-                console.error('Balance fetch error:', error.message, error.stack);
-            }
-        }
-
-        async function updateNetworkStatus() {
-            if (!web3) {
-                document.getElementById('networkStatus').textContent = 'Network: Disconnected';
-                return;
-            }
-            try {
-                const chainId = await web3.eth.getChainId();
-                const chainIdHex = '0x' + chainId.toString(16);
-                document.getElementById('networkStatus').textContent = `Network: ${chainIdHex === pharosTestnet.chainId ? 'Pharos Testnet' : 'Wrong network (Expected Pharos Testnet)'}`;
-            } catch (error) {
-                document.getElementById('networkStatus').textContent = 'Network: Error checking network';
-                console.error('Network status error:', error.message, error.stack);
-            }
-        }
+        let web3, accounts, swapContract;
 
         async function initWeb3() {
-            const status = document.getElementById('status');
-            if (!window.ethereum) {
-                status.textContent = 'Please install MetaMask to use this feature.';
-                return;
-            }
-
-            try {
+            if (window.ethereum) {
                 web3 = new Web3(window.ethereum);
-                
-                // Request account access
                 try {
                     accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    document.getElementById('connectWallet').textContent = `Connected: ${accounts[0].slice(0, 6)}...${accounts[0].slice(-4)}`;
+                    document.getElementById('approveButton').disabled = false;
+                    document.getElementById('status').textContent = 'Wallet connected. Approve tokens to swap.';
+                    await switchToPharosTestnet();
+                    swapContract = new web3.eth.Contract(swapContractABI, web3.utils.toChecksumAddress(swapContractAddress));
                 } catch (error) {
-                    if (error.code === 4001) {
-                        status.textContent = 'Connection rejected. Please approve MetaMask connection.';
-                    } else {
-                        status.textContent = `Error connecting wallet: ${error.code ? `Code ${error.code}: ` : ''}${error.message || 'Unknown error'}`;
-                    }
-                    console.error('Account access error:', error.message, error.stack);
-                    return;
+                    document.getElementById('status').textContent = 'Error connecting wallet: ' + error.message;
                 }
-
-                document.getElementById('connectWallet').textContent = `Connected: ${accounts[0].slice(0, 6)}...${accounts[0].slice(-4)}`;
-                document.getElementById('approveButton').disabled = false;
-                status.textContent = 'Wallet connected. Approve tokens or swap if already approved.';
-                
-                // Switch to Pharos Testnet
-                await switchToPharosTestnet();
-                
-                // Initialize contract
-                swapContract = new web3.eth.Contract(swapContractABI, web3.utils.toChecksumAddress(swapContractAddress));
-                
-                // Check allowance
-                await checkAllowance();
-                
-                // Update UI
-                await updateBalance();
-                await updateNetworkStatus();
-                updateTxnCount();
-                
-                // MetaMask event listeners
-                window.ethereum.on('accountsChanged', (newAccounts) => {
-                    accounts = newAccounts;
-                    if (accounts.length === 0) {
-                        status.textContent = 'Wallet disconnected. Please reconnect.';
-                        document.getElementById('connectWallet').textContent = 'Connect Wallet';
-                        document.getElementById('approveButton').disabled = true;
-                        document.getElementById('swapButton').disabled = true;
-                    } else {
-                        document.getElementById('connectWallet').textContent = `Connected: ${accounts[0].slice(0, 6)}...${accounts[0].slice(-4)}`;
-                        status.textContent = 'Wallet account changed. Approve tokens or swap if already approved.';
-                    }
-                    updateBalance();
-                    checkAllowance();
-                });
-
-                window.ethereum.on('chainChanged', async () => {
-                    await updateNetworkStatus();
-                    if ((await web3.eth.getChainId()).toString(16) !== pharosTestnet.chainId.slice(2)) {
-                        status.textContent = 'Switched to wrong network. Please switch back to Pharos Testnet.';
-                        document.getElementById('approveButton').disabled = true;
-                        document.getElementById('swapButton').disabled = true;
-                    } else {
-                        status.textContent = 'Switched to Pharos Testnet. Approve tokens or swap if already approved.';
-                        await checkAllowance();
-                    }
-                });
-            } catch (error) {
-                status.textContent = `Error connecting wallet: ${error.code ? `Code ${error.code}: ` : ''}${error.message || 'Unknown error'}`;
-                console.error('Web3 initialization error:', error.message, error.stack);
+            } else {
+                document.getElementById('status').textContent = 'Please install MetaMask to use this feature.';
             }
         }
 
         async function switchToPharosTestnet() {
-            const status = document.getElementById('status');
             try {
                 await window.ethereum.request({
                     method: 'wallet_switchEthereumChain',
                     params: [{ chainId: pharosTestnet.chainId }]
                 });
-                await updateNetworkStatus();
             } catch (switchError) {
                 if (switchError.code === 4902) {
                     try {
@@ -391,50 +270,12 @@
                             method: 'wallet_addEthereumChain',
                             params: [pharosTestnet]
                         });
-                        await updateNetworkStatus();
                     } catch (addError) {
-                        status.textContent = `Error adding Pharos Testnet: ${addError.code ? `Code ${addError.code}: ` : ''}${addError.message || 'Unknown error'}`;
-                        console.error('Add chain error:', addError.message, addError.stack);
+                        document.getElementById('status').textContent = 'Error adding Pharos Testnet: ' + addError.message;
                     }
                 } else {
-                    status.textContent = `Error switching to Pharos Testnet: ${switchError.code ? `Code ${switchError.code}: ` : ''}${switchError.message || 'Unknown error'}`;
-                    console.error('Switch chain error:', switchError.message, switchError.stack);
+                    document.getElementById('status').textContent = 'Error switching to Pharos Testnet: ' + switchError.message;
                 }
-            }
-        }
-
-        async function checkAllowance() {
-            const token1 = document.getElementById('token1').value;
-            const amount1 = document.getElementById('amount1').value;
-            const swapCount = parseInt(document.getElementById('swapCount').value);
-            const status = document.getElementById('status');
-            
-            if (!token1 || !amount1 || amount1 <= 0 || !swapCount || swapCount < 1 || swapCount > 10) {
-                return;
-            }
-
-            try {
-                const checksumToken1 = web3.utils.toChecksumAddress(token1);
-                const checksumSwapContract = web3.utils.toChecksumAddress(swapContractAddress);
-                const tokenContract = new web3.eth.Contract(erc20ABI, checksumToken1);
-                const amountIn = web3.utils.toWei(amount1, 'ether');
-                const totalAmount = web3.utils.toBN(amountIn).muln(swapCount);
-                const allowance = await tokenContract.methods.allowance(accounts[0], checksumSwapContract).call();
-
-                if (web3.utils.toBN(allowance).gte(totalAmount)) {
-                    isApproved = true;
-                    document.getElementById('approveButton').disabled = true;
-                    document.getElementById('swapButton').disabled = false;
-                    status.textContent = 'Sufficient allowance exists. You can swap.';
-                } else {
-                    isApproved = false;
-                    document.getElementById('approveButton').disabled = false;
-                    document.getElementById('swapButton').disabled = true;
-                    status.textContent = 'Approve tokens to swap.';
-                }
-            } catch (error) {
-                status.textContent = `Error checking allowance: ${error.message}`;
-                console.error('Allowance check error:', error.message, error.stack);
             }
         }
 
@@ -445,46 +286,37 @@
             const status = document.getElementById('status');
 
             if (!token1 || !amount1 || amount1 <= 0 || !swapCount || swapCount < 1 || swapCount > 10) {
-                status.textContent = 'Please select a token, enter a valid amount (min 0.0001), and a swap count (1-10).';
+                status.textContent = 'Please select a token, enter a valid amount, and a swap count (1-10).';
                 return;
             }
 
-            if (parseFloat(amount1) < 0.0001) {
-                status.textContent = 'Amount must be at least 0.0001 tokens.';
-                return;
-            }
-
-            if (!web3 || !accounts || !accounts.length) {
+            if (!accounts || !web3) {
                 status.textContent = 'Please connect your wallet first.';
                 return;
             }
 
             try {
+                // Validate addresses
                 const checksumToken1 = web3.utils.toChecksumAddress(token1);
                 const checksumSwapContract = web3.utils.toChecksumAddress(swapContractAddress);
+
+                status.textContent = 'Checking allowance...';
                 const tokenContract = new web3.eth.Contract(erc20ABI, checksumToken1);
-                const amountIn = web3.utils.toWei(amount1, 'ether');
+                const amountIn = web3.utils.toWei(amount1, 'ether'); // Assumes 18 decimals
                 const totalAmount = web3.utils.toBN(amountIn).muln(swapCount);
-                
-                status.textContent = 'Approving tokens...';
-                const gasPrice = await web3.eth.getGasPrice() * 1.2;
-                const gas = await tokenContract.methods.approve(checksumSwapContract, totalAmount).estimateGas({ from: accounts[0] });
-                const tx = await tokenContract.methods.approve(checksumSwapContract, totalAmount).send({ 
-                    from: accounts[0],
-                    gasPrice: Math.floor(gasPrice),
-                    gas: Math.floor(gas * 1.5)
-                });
-                totalTxnCount++;
-                updateTxnCount();
-                isApproved = true;
-                status.textContent = 'Tokens approved! You can now swap.';
-                document.getElementById('txnLinks').innerHTML += `<div>Approval Tx: <a href="${pharosTestnet.blockExplorerUrls[0]}/tx/${tx.transactionHash}" target="_blank">${tx.transactionHash.slice(0, 6)}...${tx.transactionHash.slice(-4)}</a></div>`;
+                const allowance = await tokenContract.methods.allowance(accounts[0], checksumSwapContract).call();
+
+                if (web3.utils.toBN(allowance).lt(totalAmount)) {
+                    status.textContent = 'Approving tokens...';
+                    await tokenContract.methods.approve(checksumSwapContract, totalAmount).send({ from: accounts[0] });
+                    status.textContent = 'Tokens approved! You can now swap.';
+                } else {
+                    status.textContent = 'Sufficient allowance already exists. You can swap.';
+                }
                 document.getElementById('approveButton').disabled = true;
                 document.getElementById('swapButton').disabled = false;
-                await updateBalance();
             } catch (error) {
-                status.textContent = `Approval failed: ${error.code ? `Code ${error.code}: ` : ''}${error.message || 'Unknown error'}`;
-                console.error('Approval error:', error.message, error.stack);
+                status.textContent = 'Approval failed: ' + error.message;
             }
         }
 
@@ -494,107 +326,44 @@
             const amount1 = document.getElementById('amount1').value;
             const swapCount = parseInt(document.getElementById('swapCount').value);
             const status = document.getElementById('status');
-            const txnLinks = document.getElementById('txnLinks');
 
             if (!token1 || !token2 || !amount1 || amount1 <= 0 || !swapCount || swapCount < 1 || swapCount > 10) {
-                status.textContent = 'Please select tokens, enter a valid amount (min 0.0001), and a swap count (1-10).';
+                status.textContent = 'Please select tokens, enter a valid amount, and a swap count (1-10).';
                 return;
             }
 
-            if (parseFloat(amount1) < 0.0001) {
-                status.textContent = 'Amount must be at least 0.0001 tokens.';
-                return;
-            }
-
-            if (token1 === token2) {
-                status.textContent = 'Input and output tokens must be different.';
-                return;
-            }
-
-            if (!web3 || !accounts || !swapContract) {
-                status.textContent = 'Please connect your wallet first.';
-                return;
-            }
-
-            // Check allowance
-            await checkAllowance();
-            if (!isApproved) {
-                status.textContent = 'Please approve tokens before swapping.';
+            if (!accounts || !swapContract) {
+                status.textContent = 'Please connect your wallet and approve tokens first.';
                 return;
             }
 
             try {
+                // Validate addresses
                 const checksumToken1 = web3.utils.toChecksumAddress(token1);
                 const checksumToken2 = web3.utils.toChecksumAddress(token2);
-                const amountIn = web3.utils.toWei(amount1, 'ether');
-                
-                // Get current block timestamp
-                const latestBlock = await web3.eth.getBlock('latest');
-                const currentTimestamp = latestBlock.timestamp;
-                const deadline = Number(currentTimestamp) + 60 * 10; // 10 minutes
-                
-                // Slippage protection: 95% of amountIn
-                const amountOutMin = web3.utils.toBN(amountIn).muln(95).divn(100).toString();
-                const path = [checksumToken1, checksumToken2];
 
-                // Log parameters
-                console.log('Swap parameters:', {
-                    token1: checksumToken1,
-                    token2: checksumToken2,
-                    amountIn: amountIn.toString(),
-                    amountOutMin,
-                    path,
-                    to: accounts[0],
-                    deadline,
-                    swapCount,
-                    currentTimestamp
-                });
+                const amountIn = web3.utils.toWei(amount1, 'ether'); // Assumes 18 decimals
+                const amountOutMin = 0; // Simplified for testnet; adjust for production
+                const path = [checksumToken1, checksumToken2];
+                const deadline = Math.floor(Date.now() / 1000) + 60 * 20; // 20 minutes from now
 
                 status.textContent = `Initiating ${swapCount} swap(s)...`;
-                const gasPrice = await web3.eth.getGasPrice() * 1.2;
-
-                // Execute individual swaps
-                for (let i = 0; i < swapCount; i++) {
-                    status.textContent = `Processing swap ${i + 1} of ${swapCount}...`;
-                    let gas;
-                    try {
-                        gas = await swapContract.methods.swapExactTokensForTokens(
-                            amountIn,
-                            amountOutMin,
-                            path,
-                            accounts[0],
-                            deadline
-                        ).estimateGas({ from: accounts[0] });
-                    } catch (gasError) {
-                        const revertReason = gasError.data ? decodeRevertReason(gasError.data) : gasError.message;
-                        status.textContent = `Gas estimation failed for swap ${i + 1}: ${revertReason || 'Unknown error'}`;
-                        console.error('Gas estimation error:', gasError.message, gasError.stack, { data: gasError.data });
-                        return;
-                    }
-                    const tx = await swapContract.methods.swapExactTokensForTokens(
+                for (let i = 1; i <= swapCount; i++) {
+                    status.textContent = `Performing swap ${i} of ${swapCount}...`;
+                    await swapContract.methods.swapExactTokensForTokens(
                         amountIn,
                         amountOutMin,
                         path,
                         accounts[0],
                         deadline
-                    ).send({ 
-                        from: accounts[0],
-                        gasPrice: Math.floor(gasPrice),
-                        gas: Math.floor(gas * 1.5)
-                    });
-                    totalTxnCount++;
-                    updateTxnCount();
-                    txnLinks.innerHTML += `<div>Swap ${i + 1} Tx: <a href="${pharosTestnet.blockExplorerUrls[0]}/tx/${tx.transactionHash}" target="_blank">${tx.transactionHash.slice(0, 6)}...${tx.transactionHash.slice(-4)}</a></div>`;
+                    ).send({ from: accounts[0] });
+                    status.textContent = `Swap ${i} of ${swapCount} successful!`;
                 }
-
-                status.textContent = `All ${swapCount} swaps completed successfully!`;
-                document.getElementById('approveButton').disabled = false;
-                document.getElementById('swapButton').disabled = false;
-                await updateBalance();
+                status.textContent = `All ${swapCount} swaps completed! You can swap again.`;
+                document.getElementById('approveButton').disabled = false; // Allow re-approval for next swaps
+                document.getElementById('swapButton').disabled = true; // Disable until re-approved
             } catch (error) {
-                const revertReason = error.data ? decodeRevertReason(error.data) : error.message;
-                status.textContent = `Swap failed: ${error.code ? `Code ${error.code}: ` : ''}${revertReason || 'Unknown error'}`;
-                console.error('Swap error:', error.message, error.stack, { data: error.data });
+                status.textContent = 'Swap failed: ' + error.message;
             }
         }
 
@@ -602,16 +371,6 @@
         document.getElementById('connectWallet').addEventListener('click', initWeb3);
         document.getElementById('approveButton').addEventListener('click', approveTokens);
         document.getElementById('swapButton').addEventListener('click', swapTokens);
-        document.getElementById('token1').addEventListener('change', checkAllowance);
-        document.getElementById('amount1').addEventListener('input', checkAllowance);
-        document.getElementById('swapCount').addEventListener('input', checkAllowance);
-
-        // Initialize UI
-        document.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('balance').textContent = 'Balance: Not connected';
-            updateTxnCount();
-            updateNetworkStatus();
-        });
     </script>
 </body>
 </html>
