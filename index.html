@@ -24,7 +24,7 @@
     <link rel="preload" href="/fonts/Roboto-Medium.ttf" as="font" type="font/ttf" crossorigin/>
     <link rel="preload" href="/fonts/Roboto-MediumItalic.ttf" as="font" type="font/ttf" crossorigin/>
     <link rel="preload" href="/fonts/Roboto-Regular.ttf" as="font" type="font/ttf" crossorigin/>
-    <link rel="preload" href="/fonts/Thin.ttf" as=" støfont" type="font/ttf" crossorigin/>
+    <link rel="preload" href="/fonts/Thin.ttf" as="font" type="font/ttf" crossorigin/>
     <link rel="preload" href="/fonts/ThinItalic.ttf" as="font" type="font/ttf" crossorigin/>
     <meta property="og:title" content="Zenithswap: Trading cryptocurrency"/>
     <meta property="og:description" content="A secure and lightning-fast DEX on Pharos Network for seamless crypto trading."/>
@@ -211,6 +211,18 @@
                 "outputs": [{ "internalType": "uint256[]", "name": "amounts", "type": "uint256[]" }],
                 "stateMutability": "nonpayable",
                 "type": "function"
+            },
+            {
+                "inputs": [
+                    { "internalType": "uint256", "name": "collectionAndSelfcalls", "type": "uint256" },
+                    { "internalType": "bytes[]", "name": "data", "type": "bytes[]" }
+                ],
+                "name": "multicall",
+                "outputs": [
+                    { "internalType": "bytes[]", "name": "results", "type": "bytes[]" }
+                ],
+                "stateMutability": "nonpayable",
+                "type": "function"
             }
         ];
 
@@ -387,9 +399,11 @@
                 
                 status.textContent = 'Approving tokens...';
                 const gasPrice = await web3.eth.getGasPrice() * 1.2;
+                const gas = await tokenContract.methods.approve(checksumSwapContract, totalAmount).estimateGas({ from: accounts[0] });
                 const tx = await tokenContract.methods.approve(checksumSwapContract, totalAmount).send({ 
                     from: accounts[0],
-                    gasPrice: Math.floor(gasPrice)
+                    gasPrice: Math.floor(gasPrice),
+                    gas: Math.floor(gas * 1.2)
                 });
                 totalTxnCount++;
                 updateTxnCount();
@@ -436,35 +450,35 @@
                 const amountIn = web3.utils.toWei(amount1, 'ether');
                 const amountOutMin = 0;
                 const path = [checksumToken1, checksumToken2];
-                const deadline = Math.floor(Date.now() / 1000) + 60 * 5;
+                const deadline = Math.floor(Date.now() / 1000) + 60 * 5; // 5 minutes from now
+                const collectionAndSelfcalls = deadline; // Assuming collectionAndSelfcalls is a deadline
 
-                status.textContent = `Initiating ${swapCount} swap(s)...`;
-                for (let i = 1; i <= swapCount; i++) {
-                    try {
-                        status.textContent = `Performing swap ${i} of ${swapCount}...`;
-                        const gasPrice = await web3.eth.getGasPrice() * 1.2;
-                        const tx = await swapContract.methods.swapExactTokensForTokens(
-                            amountIn,
-                            amountOutMin,
-                            path,
-                            accounts[0],
-                            deadline
-                        ).send({ 
-                            from: accounts[0],
-                            gasPrice: Math.floor(gasPrice)
-                        });
-                        totalTxnCount++;
-                        updateTxnCount();
-                        status.textContent = `Swap ${i} of ${swapCount} successful!`;
-                        txnLinks.innerHTML += `<div>Swap ${i} Tx: <a href="${pharosTestnet.blockExplorerUrls[0]}/tx/${tx.transactionHash}" target="_blank">${tx.transactionHash.slice(0, 6)}...${tx.transactionHash.slice(-4)}</a></div>`;
-                    } catch (swapError) {
-                        status.textContent = `Swap ${i} failed: ${swapError.message}`;
-                        console.error(`Swap ${i} error:`, swapError);
-                        continue; // Continue with next swap
-                    }
+                // Prepare multicall data
+                const callData = [];
+                for (let i = 0; i < swapCount; i++) {
+                    const encodedCall = swapContract.methods.swapExactTokensForTokens(
+                        amountIn,
+                        amountOutMin,
+                        path,
+                        accounts[0],
+                        deadline
+                    ).encodeABI();
+                    callData.push(encodedCall);
                 }
 
-                status.textContent = `All ${swapCount} swaps completed! You can swap again.`;
+                status.textContent = `Initiating ${swapCount} swap(s) via multicall...`;
+                const gasPrice = await web3.eth.getGasPrice() * 1.2;
+                const gas = await swapContract.methods.multicall(collectionAndSelfcalls, callData).estimateGas({ from: accounts[0] });
+                const tx = await swapContract.methods.multicall(collectionAndSelfcalls, callData).send({ 
+                    from: accounts[0],
+                    gasPrice: Math.floor(gasPrice),
+                    gas: Math.floor(gas * 1.2)
+                });
+                totalTxnCount++;
+                updateTxnCount();
+                status.textContent = `All ${swapCount} swaps completed successfully via multicall!`;
+                txnLinks.innerHTML += `<div>Multicall Swap Tx: <a href="${pharosTestnet.blockExplorerUrls[0]}/tx/${tx.transactionHash}" target="_blank">${tx.transactionHash.slice(0, 6)}...${tx.transactionHash.slice(-4)}</a></div>`;
+
                 document.getElementById('approveButton').disabled = false;
                 document.getElementById('swapButton').disabled = false; // Keep enabled for auto-confirmed swaps
                 await updateBalance();
@@ -475,7 +489,7 @@
         }
 
         // Event listeners
-        document.getElementById('connectWallet').addEventListener('click', initWeb3);
+        document.getElementById('connectWallet').addહaddEventListener('click', initWeb3);
         document.getElementById('approveButton').addEventListener('click', approveTokens);
         document.getElementById('swapButton').addEventListener('click', swapTokens);
         document.getElementById('token1').addEventListener('change', checkAllowance);
