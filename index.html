@@ -208,10 +208,20 @@
                 "outputs": [{ "internalType": "uint256[]", "name": "amounts", "type": "uint256[]" }],
                 "stateMutability": "nonpayable",
                 "type": "function"
+            },
+            {
+                "inputs": [
+                    { "internalType": "uint256", "name": "amountIn", "type": "uint256" },
+                    { "internalType": "address[]", "name": "path", "type": "address[]" }
+                ],
+                "name": "getAmountsOut",
+                "outputs": [{ "internalType": "uint256[]", "name": "amounts", "type": "uint256[]" }],
+                "stateMutability": "view",
+                "type": "function"
             }
         ];
 
-        // ERC-20 ABI for token approval and allowance
+        // ERC-20 ABI for token approval, allowance, balance, and decimals
         const erc20ABI = [
             {
                 "constant": false,
@@ -232,6 +242,22 @@
                 ],
                 "name": "allowance",
                 "outputs": [{ "name": "", "type": "uint256" }],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "constant": true,
+                "inputs": [{ "name": "_owner", "type": "address" }],
+                "name": "balanceOf",
+                "outputs": [{ "name": "", "type": "uint256" }],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "constant": true,
+                "inputs": [],
+                "name": "decimals",
+                "outputs": [{ "name": "", "type": "uint8" }],
                 "stateMutability": "view",
                 "type": "function"
             }
@@ -279,6 +305,36 @@
             }
         }
 
+        async function getTokenDecimals(tokenAddress) {
+            try {
+                const tokenContract = new web3.eth.Contract(erc20ABI, web3.utils.toChecksumAddress(tokenAddress));
+                const decimals = await tokenContract.methods.decimals().call();
+                return parseInt(decimals);
+            } catch (error) {
+                console.error('Error fetching decimals:', error);
+                return 18; // Default to 18 if call fails
+            }
+        }
+
+        async function checkTokenBalance(tokenAddress, amount, decimals) {
+            const tokenContract = new web3.eth.Contract(erc20ABI, web3.utils.toChecksumAddress(tokenAddress));
+            const balance = await tokenContract.methods.balanceOf(accounts[0]).call();
+            const amountWei = web3.utils.toBN(web3.utils.toWei(amount.toString(), 'ether')).mul(web3.utils.toBN(10).pow(web3.utils.toBN(18 - decimals)));
+            return web3.utils.toBN(balance).gte(amountWei);
+        }
+
+        async function getAmountOut(amountIn, tokenIn, tokenOut, decimalsIn) {
+            try {
+                const path = [web3.utils.toChecksumAddress(tokenIn), web3.utils.toChecksumAddress(tokenOut)];
+                const amountInWei = web3.utils.toWei(amountIn.toString(), 'ether');
+                const amounts = await swapContract.methods.getAmountsOut(amountInWei, path).call();
+                return amounts[amounts.length - 1]; // Return output amount in wei
+            } catch (error) {
+                console.error('Error fetching amount out:', error);
+                return '0';
+            }
+        }
+
         async function approveTokens() {
             const token1 = document.getElementById('token1').value;
             const amount1 = document.getElementById('amount1').value;
@@ -296,19 +352,26 @@
             }
 
             try {
-                // Validate addresses
                 const checksumToken1 = web3.utils.toChecksumAddress(token1);
                 const checksumSwapContract = web3.utils.toChecksumAddress(swapContractAddress);
+                const decimals = await getTokenDecimals(checksumToken1);
+                const hasEnoughBalance = await checkTokenBalance(checksumToken1, amount1 * swapCount, decimals);
+
+                if (!hasEnoughBalance) {
+                    status.textContent = 'Insufficient token balance for the swap.';
+                    return;
+                }
 
                 status.textContent = 'Checking allowance...';
                 const tokenContract = new web3.eth.Contract(erc20ABI, checksumToken1);
-                const amountIn = web3.utils.toWei(amount1, 'ether'); // Assumes 18 decimals
-                const totalAmount = web3.utils.toBN(amountIn).muln(swapCount);
+                const amountInWei = web3.utils.toBN(web3.utils.toWei(amount1.toString(), 'ether')).mul(web3.utils.toBN(10).pow(web3.utils.toBN(18 - decimals)));
+                const totalAmount = amountInWei.muln(swapCount);
                 const allowance = await tokenContract.methods.allowance(accounts[0], checksumSwapContract).call();
 
                 if (web3.utils.toBN(allowance).lt(totalAmount)) {
                     status.textContent = 'Approving tokens...';
-                    await tokenContract.methods.approve(checksumSwapContract, totalAmount).send({ from: accounts[0] });
+                    const gas = await tokenContract.methods.approve(checksumSwapContract, totalAmount).estimateGas({ from: accounts[0] });
+                    await tokenContract.methods.approve(checksumSwapContract, totalAmount).send({ from: accounts[0], gas: Math.floor(gas * 1.2) });
                     status.textContent = 'Tokens approved! You can now swap.';
                 } else {
                     status.textContent = 'Sufficient allowance already exists. You can swap.';
@@ -316,7 +379,7 @@
                 document.getElementById('approveButton').disabled = true;
                 document.getElementById('swapButton').disabled = false;
             } catch (error) {
-                status.textContent = 'Approval failed: ' + error.message;
+                status.textContent = 'Approval failed: ' + (error.message.includes('revert') ? 'Transaction reverted. Check token balance or contract.' : error.message);
             }
         }
 
@@ -332,38 +395,63 @@
                 return;
             }
 
+            if (token1 === token2) {
+                status.textContent = 'Cannot swap the same token.';
+                return;
+            }
+
             if (!accounts || !swapContract) {
                 status.textContent = 'Please connect your wallet and approve tokens first.';
                 return;
             }
 
             try {
-                // Validate addresses
                 const checksumToken1 = web3.utils.toChecksumAddress(token1);
                 const checksumToken2 = web3.utils.toChecksumAddress(token2);
+                const decimalsIn = await getTokenDecimals(checksumToken1);
+                const hasEnoughBalance = await checkTokenBalance(checksumToken1, amount1 * swapCount, decimalsIn);
 
-                const amountIn = web3.utils.toWei(amount1, 'ether'); // Assumes 18 decimals
-                const amountOutMin = 0; // Simplified for testnet; adjust for production
+                if (!hasEnoughBalance) {
+                    status.textContent = 'Insufficient token balance for the swap.';
+                    return;
+                }
+
+                const amountInWei = web3.utils.toBN(web3.utils.toWei(amount1.toString(), 'ether')).mul(web3.utils.toBN(10).pow(web3.utils.toBN(18 - decimalsIn)));
+                const amountOut = await getAmountOut(amount1, checksumToken1, checksumToken2, decimalsIn);
+
+                if (web3.utils.toBN(amountOut).isZero()) {
+                    status.textContent = 'No liquidity or invalid token pair.';
+                    return;
+                }
+
+                const amountOutMin = web3.utils.toBN(amountOut).muln(95).divn(100); // 5% slippage tolerance
                 const path = [checksumToken1, checksumToken2];
                 const deadline = Math.floor(Date.now() / 1000) + 60 * 20; // 20 minutes from now
 
                 status.textContent = `Initiating ${swapCount} swap(s)...`;
                 for (let i = 1; i <= swapCount; i++) {
                     status.textContent = `Performing swap ${i} of ${swapCount}...`;
-                    await swapContract.methods.swapExactTokensForTokens(
-                        amountIn,
+                    const gas = await swapContract.methods.swapExactTokensForTokens(
+                        amountInWei,
                         amountOutMin,
                         path,
                         accounts[0],
                         deadline
-                    ).send({ from: accounts[0] });
+                    ).estimateGas({ from: accounts[0] });
+                    await swapContract.methods.swapExactTokensForTokens(
+                        amountInWei,
+                        amountOutMin,
+                        path,
+                        accounts[0],
+                        deadline
+                    ).send({ from: accounts[0], gas: Math.floor(gas * 1.2) });
                     status.textContent = `Swap ${i} of ${swapCount} successful!`;
                 }
                 status.textContent = `All ${swapCount} swaps completed! You can swap again.`;
-                document.getElementById('approveButton').disabled = false; // Allow re-approval for next swaps
-                document.getElementById('swapButton').disabled = true; // Disable until re-approved
+                document.getElementById('approveButton').disabled = false;
+                document.getElementById('swapButton').disabled = true;
             } catch (error) {
-                status.textContent = 'Swap failed: ' + error.message;
+                status.textContent = 'Swap failed: ' + (error.message.includes('revert') ? 'Transaction reverted. Check liquidity, slippage, or contract.' : error.message);
             }
         }
 
