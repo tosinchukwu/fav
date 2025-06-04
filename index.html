@@ -216,18 +216,6 @@
                 "outputs": [{ "internalType": "uint256[]", "name": "amounts", "type": "uint256[]" }],
                 "stateMutability": "nonpayable",
                 "type": "function"
-            },
-            {
-                "inputs": [
-                    { "internalType": "uint256", "name": "collectionAndSelfcalls", "type": "uint256" },
-                    { "internalType": "bytes[]", "name": "data", "type": "bytes[]" }
-                ],
-                "name": "multicall",
-                "outputs": [
-                    { "internalType": "bytes[]", "name": "results", "type": "bytes[]" }
-                ],
-                "stateMutability": "nonpayable",
-                "type": "function"
             }
         ];
 
@@ -267,10 +255,10 @@
 
         let web3, accounts, swapContract, totalTxnCount = 0, isApproved = false;
 
-        // Simple revert reason decoder
+        // Revert reason decoder
         function decodeRevertReason(errorData) {
             if (!errorData || !errorData.startsWith('0x08c379a0')) return 'Unknown revert reason';
-            const messageHex = errorData.slice(74); // Skip selector and offset
+            const messageHex = errorData.slice(74);
             try {
                 return web3.utils.hexToUtf8('0x' + messageHex);
             } catch {
@@ -540,17 +528,16 @@
                 const checksumToken2 = web3.utils.toChecksumAddress(token2);
                 const amountIn = web3.utils.toWei(amount1, 'ether');
                 
-                // Get current block timestamp for deadline
+                // Get current block timestamp
                 const latestBlock = await web3.eth.getBlock('latest');
                 const currentTimestamp = latestBlock.timestamp;
-                const deadline = Number(currentTimestamp) + 60 * 10; // 10 minutes from now
+                const deadline = Number(currentTimestamp) + 60 * 10; // 10 minutes
                 
-                // Set amountOutMin to prevent slippage (95% of expected output)
+                // Slippage protection: 95% of amountIn
                 const amountOutMin = web3.utils.toBN(amountIn).muln(95).divn(100).toString();
                 const path = [checksumToken1, checksumToken2];
-                const collectionAndSelfcalls = 0; // Fallback; test with deadline if needed
 
-                // Log parameters for debugging
+                // Log parameters
                 console.log('Swap parameters:', {
                     token1: checksumToken1,
                     token2: checksumToken2,
@@ -559,45 +546,48 @@
                     path,
                     to: accounts[0],
                     deadline,
-                    collectionAndSelfcalls,
                     swapCount,
                     currentTimestamp
                 });
 
-                // Prepare multicall data
-                const callData = [];
+                status.textContent = `Initiating ${swapCount} swap(s)...`;
+                const gasPrice = await web3.eth.getGasPrice() * 1.2;
+
+                // Execute individual swaps
                 for (let i = 0; i < swapCount; i++) {
-                    const encodedCall = swapContract.methods.swapExactTokensForTokens(
+                    status.textContent = `Processing swap ${i + 1} of ${swapCount}...`;
+                    let gas;
+                    try {
+                        gas = await swapContract.methods.swapExactTokensForTokens(
+                            amountIn,
+                            amountOutMin,
+                            path,
+                            accounts[0],
+                            deadline
+                        ).estimateGas({ from: accounts[0] });
+                    } catch (gasError) {
+                        const revertReason = gasError.data ? decodeRevertReason(gasError.data) : gasError.message;
+                        status.textContent = `Gas estimation failed for swap ${i + 1}: ${revertReason || 'Unknown error'}`;
+                        console.error('Gas estimation error:', gasError.message, gasError.stack, { data: gasError.data });
+                        return;
+                    }
+                    const tx = await swapContract.methods.swapExactTokensForTokens(
                         amountIn,
                         amountOutMin,
                         path,
                         accounts[0],
                         deadline
-                    ).encodeABI();
-                    callData.push(encodedCall);
+                    ).send({ 
+                        from: accounts[0],
+                        gasPrice: Math.floor(gasPrice),
+                        gas: Math.floor(gas * 1.5)
+                    });
+                    totalTxnCount++;
+                    updateTxnCount();
+                    txnLinks.innerHTML += `<div>Swap ${i + 1} Tx: <a href="${pharosTestnet.blockExplorerUrls[0]}/tx/${tx.transactionHash}" target="_blank">${tx.transactionHash.slice(0, 6)}...${tx.transactionHash.slice(-4)}</a></div>`;
                 }
 
-                status.textContent = `Initiating ${swapCount} swap(s) via multicall...`;
-                const gasPrice = await web3.eth.getGasPrice() * 1.2;
-                let gas;
-                try {
-                    gas = await swapContract.methods.multicall(collectionAndSelfcalls, callData).estimateGas({ from: accounts[0] });
-                } catch (gasError) {
-                    const revertReason = gasError.data ? decodeRevertReason(gasError.data) : gasError.message;
-                    status.textContent = `Gas estimation failed: ${revertReason || 'Unknown error'}`;
-                    console.error('Gas estimation error:', gasError.message, gasError.stack, { data: gasError.data });
-                    return;
-                }
-                const tx = await swapContract.methods.multicall(collectionAndSelfcalls, callData).send({ 
-                    from: accounts[0],
-                    gasPrice: Math.floor(gasPrice),
-                    gas: Math.floor(gas * 1.5)
-                });
-                totalTxnCount++;
-                updateTxnCount();
-                status.textContent = `All ${swapCount} swaps completed successfully via multicall!`;
-                txnLinks.innerHTML += `<div>Multicall Swap Tx: <a href="${pharosTestnet.blockExplorerUrls[0]}/tx/${tx.transactionHash}" target="_blank">${tx.transactionHash.slice(0, 6)}...${tx.transactionHash.slice(-4)}</a></div>`;
-
+                status.textContent = `All ${swapCount} swaps completed successfully!`;
                 document.getElementById('approveButton').disabled = false;
                 document.getElementById('swapButton').disabled = false;
                 await updateBalance();
@@ -616,7 +606,7 @@
         document.getElementById('amount1').addEventListener('input', checkAllowance);
         document.getElementById('swapCount').addEventListener('input', checkAllowance);
 
-        // Initialize UI on page load
+        // Initialize UI
         document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('balance').textContent = 'Balance: Not connected';
             updateTxnCount();
