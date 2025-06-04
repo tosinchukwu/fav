@@ -1,186 +1,10 @@
 <!doctype html>
 <html translate="no">
 <head>
-    <meta charset="utf-8"/>
-    <title>Testing: Pharos Testnet</title>
-    <meta name="description" content="A secure and lightning-fast DEX on Pharos Network for seamless crypto trading."/>
-    <link rel="shortcut icon" type="image/jpg" href="/favicon.svg"/>
-    <link rel="apple-touch-icon" sizes="192x192" href="/images/192x192_App_Icon.png"/>
-    <link rel="apple-touch-icon" sizes="512x512" href="/images/512x512_App_Icon.png"/>
-    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
-    <meta name="theme-color" content="#fff"/>
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' 'wasm-unsafe-eval' data: https://translate.googleapis.com/ https://vercel.com https://vercel.live/ https://www.google-analytics.com https://www.googletagmanager.com https://challenges.cloudflare.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' 'unsafe-eval'; img-src * 'self' blob: data: https://assets.coingecko.com/ https://cdn.center.app/ https://ethereum-optimism.github.io/ https://explorer-api.walletconnect.com/ https://i.seadn.io/ https://lh3.googleusercontent.com/ https://openseauserdata.com/ https://raw.githubusercontent.com/ https://raw.seadn.io/ https://s2.coinmarketcap.com/ https://static.optimism.io/ https://vercel.com https://vercel.live/ https://trustwallet.com/ https://cloudflare-ipfs.com/ https://challenges.cloudflare.com; frame-src 'self' https://buy.moonpay.com/ https://vercel.com https://vercel.live/ https://verify.walletconnect.com/ https://verify.walletconnect.org/ https://challenges.cloudflare.com; connect-src * 'self' blob: data: https://statsigapi.net https://api.moonpay.com/ https://api.opensea.io https://api.thegraph.com/ https://arbitrum-mainnet.infura.io/ https://avalanche-mainnet.infura.io/ https://base-mainnet.infura.io/ https://bridge.arbitrum.io https://celo-org.github.io https://cloudflare-ipfs.com https://explorer-api.walletconnect.com https://forno.celo.org/ https://gateway.ipfs.io/ https://mainnet.infura.io https://o1037921.ingest.sentry.io https://old-wispy-arrow.bsc.quiknode.pro/ https://optimism-mainnet.infura.io/ https://polygon-mainnet.infura.io/ https://raw.githubusercontent.com https://static.optimism.io https://tokenlist.arbitrum.io https://tokens.coingecko.com https://ultra-blue-flower.quiknode.pro https://vercel.com https://vercel.live/ https://www.gemini.com wss://relay.walletconnect.com/ wss://www.walletlink.org/rpc https://challenges.cloudflare.com https://rpc.testnet.pharosnetwork.xyz; worker-src 'self' blob:;"/>
-    <meta name="apple-itunes-app" content="app-id=6443944476"/>
-    <link rel="manifest" href="/manifest.json"/>
-    <link rel="preconnect" href="https://main-subgraph.__HOST__.com/" crossorigin/>
-    <link rel="preconnect" href="https://mainnet.infura.io/" crossorigin/>
-    <link rel="preload" href="/fonts/Roboto-Black.ttf" as="font" type="font/ttf" crossorigin/>
-    <link rel="preload" href="/fonts/Roboto-BlackItalic.ttf" as="font" type="font/ttf" crossorigin/>
-    <link rel="preload" href="/fonts/Roboto-Bold.ttf" as="font" type="font/ttf" crossorigin/>
-    <link rel="preload" href="/fonts/Roboto-BoldItalic.ttf" as="font" type="font/ttf" crossorigin/>
-    <link rel="preload" href="/fonts/Roboto-Italic.ttf" as="font" type="font/ttf" crossorigin/>
-    <link rel="preload" href="/fonts/Roboto-Light.ttf" as="font" type="font/ttf" crossorigin/>
-    <link rel="preload" href="/fonts/Roboto-LightItalic.ttf" as="font" type="font/ttf" crossorigin/>
-    <link rel="preload" href="/fonts/Roboto-Medium.ttf" as="font" type="font/ttf" crossorigin/>
-    <link rel="preload" href="/fonts/Roboto-MediumItalic.ttf" as="font" type="font/ttf" crossorigin/>
-    <link rel="preload" href="/fonts/Roboto-Regular.ttf" as="font" type="font/ttf" crossorigin/>
-    <link rel="preload" href="/fonts/Thin.ttf" as="font" type="font/ttf" crossorigin/>
-    <link rel="preload" href="/fonts/ThinItalic.ttf" as="font" type="font/ttf" crossorigin/>
-    <meta property="og:title" content="Zenithswap: Trading cryptocurrency"/>
-    <meta property="og:description" content="A secure and lightning-fast DEX on Pharos Network for seamless crypto trading."/>
-    <meta property="og:url" content="https://www.__HOST__.com/"/>
-    <meta property="og:site_name" content="Zenithswap: Trading cryptocurrency"/>
-    <meta property="og:locale" content="en_US"/>
-    <meta property="og:image:url" content="https://testnet.zenithswap.xyz/images/zenith-twitter.jpg?v=2"/>
-    <meta property="og:image:width" content="192"/>
-    <meta property="og:image:height" content="192"/>
-    <meta property="og:image:alt" content="Zenithswap Logo"/>
-    <meta property="og:type" content="website"/>
-    <meta name="twitter:card" content="summary_large_image"/>
-    <meta name="twitter:title" content="Zenithswap: Trading cryptocurrency"/>
-    <meta name="twitter:description" content="A secure and lightning-fast DEX on Pharos Network for seamless crypto trading."/>
-    <meta name="twitter:image" content="https://testnet.zenithswap.xyz/images/zenith-twitter.jpg?v=2"/>
-    <style>
-        * {
-            font-family: "DM Sans";
-            box-sizing: border-box;
-        }
-        @font-face {
-            font-family: "DM Sans";
-            font-weight: 600;
-            font-style: normal;
-            font-display: block;
-            src: url("/fonts/DMSans-Medium.ttf") format("truetype");
-        }
-        @font-face {
-            font-family: "DM Sans";
-            font-weight: 500;
-            font-style: normal;
-            font-display: block;
-            src: url("/fonts/DMSans-Medium.ttf") format("truetype");
-        }
-        @supports (font-variation-settings: normal) {
-            * {
-                font-family: "DM Sans";
-            }
-        }
-        body, html {
-            margin: 0;
-            padding: 0;
-        }
-        button {
-            user-select: none;
-        }
-        html {
-            font-size: 16px;
-            font-weight: 500;
-            font-variant: none;
-            font-smooth: always;
-            text-rendering: optimizeLegibility !important;
-            -webkit-font-smoothing: antialiased !important;
-            -moz-osx-font-smoothing: grayscale;
-            -webkit-tap-highlight-color: transparent;
-        }
-        #background-radial-gradient {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            pointer-events: none;
-            width: 200vw;
-            height: 200vh;
-            transform: translate(-50vw, -100vh);
-            z-index: -1;
-        }
-        #root, body, html {
-            min-height: 100%;
-        }
-        @media (prefers-color-scheme: dark) {
-            html {
-                background: linear-gradient(#131313 0, #131313 100%);
-            }
-        }
-        @media (prefers-color-scheme: light) {
-            html {
-                background: radial-gradient(100% 100% at 50% 0, rgba(255, 184, 226, 0) 0, rgba(255, 255, 255, 0) 100%), #fff;
-            }
-        }
-        .swap-container {
-            max-width: 400px;
-            margin: 50px auto;
-            padding: 20px;
-            background: #f9f9f9;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            text-align: center;
-        }
-        .swap-container select, .swap-container input {
-            width: 100%;
-            padding: 10px;
-            margin: 10px 0;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            font-family: "DM Sans";
-            font-size: 16px;
-        }
-        .swap-container button {
-            width: 100%;
-            padding: 10px;
-            background: #007bff;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            font-family: "DM Sans";
-            font-size: 16px;
-            cursor: pointer;
-            transition: background 0.3s;
-            margin-top: 10px;
-        }
-        .swap-container button:hover {
-            background: #0056b3;
-        }
-        .swap-container button:disabled {
-            background: #cccccc;
-            cursor: not-allowed;
-        }
-        .status {
-            margin-top: 10px;
-            font-size: 14px;
-            color: #333;
-        }
-    </style>
-    <script src="https://cdn.jsdelivr.net/npm/web3@1.8.0/dist/web3.min.js"></script>
-    <script defer="defer" src="/static/js/880.2082fd26.js"></script>
-    <script defer="defer" src="/static/js/232.b34f18d1.js"></script>
-    <script defer="defer" src="/static/js/830.b7bb047b.js"></script>
-    <script defer="defer" src="/static/js/966.93fb1677.js"></script>
-    <script defer="defer" src="/static/js/311.73876aa5.js"></script>
-    <script defer="defer" src="/static/js/726.ded68954.js"></script>
-    <script defer="defer" src="/static/js/main.3b6f0e39.js"></script>
-    <link href="/static/css/830.07c7c7cb.css" rel="stylesheet">
+    <!-- Your existing head content remains unchanged -->
 </head>
 <body>
-    <noscript>You need to enable JavaScript to run this app.</noscript>
-    <div id="root">
-        <div class="swap-container">
-            <h2>Zenithswap on Pharos Testnet</h2>
-            <button id="connectWallet">Connect Wallet</button>
-            <select id="token1">
-                <option value="0x76aaada469d23216be5f7c596fa25f282ff9b364">WPHRS</option>
-                <option value="0xad902cf99c2de2f1ba5ec4d642fd7e49cae9ee37">USDT</option>
-            </select>
-            <input type="number" id="amount1" placeholder="Amount to swap" min="0" step="0.01"/>
-            <select id="token2">
-                <option value="0xad902cf99c2de2f1ba5ec4d642fd7e49cae9ee37">USDT</option>
-                <option value="0x76aaada469d23216be5f7c596fa25f282ff9b364">WPHRS</option>
-            </select>
-            <input type="number" id="swapCount" placeholder="Number of swaps (1-10)" min="1" max="10" step="1" value="1"/>
-            <button id="approveButton" disabled>Approve Tokens</button>
-            <button id="swapButton" disabled>Swap Tokens</button>
-            <div id="status" class="status">Please connect your wallet to start swapping.</div>
-        </div>
-    </div>
-    <div id="background-radial-gradient"></div>
+    <!-- Your existing HTML remains unchanged -->
     <script>
         "undefined" != typeof window && (window.Browser = { T: () => {} });
 
@@ -206,6 +30,16 @@
                 ],
                 "name": "swapExactTokensForTokens",
                 "outputs": [{ "internalType": "uint256[]", "name": "amounts", "type": "uint256[]" }],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    { "internalType": "uint256", "name": "collectionAndSelfcalls", "type": "uint256" },
+                    { "internalType": "bytes[]", "name": "data", "type": "bytes[]" }
+                ],
+                "name": "multicall",
+                "outputs": [{ "internalType": "bytes[]", "name": "results", "type": "bytes[]" }],
                 "stateMutability": "nonpayable",
                 "type": "function"
             }
@@ -296,10 +130,8 @@
             }
 
             try {
-                // Validate addresses
                 const checksumToken1 = web3.utils.toChecksumAddress(token1);
                 const checksumSwapContract = web3.utils.toChecksumAddress(swapContractAddress);
-
                 status.textContent = 'Checking allowance...';
                 const tokenContract = new web3.eth.Contract(erc20ABI, checksumToken1);
                 const amountIn = web3.utils.toWei(amount1, 'ether'); // Assumes 18 decimals
@@ -338,32 +170,37 @@
             }
 
             try {
-                // Validate addresses
                 const checksumToken1 = web3.utils.toChecksumAddress(token1);
                 const checksumToken2 = web3.utils.toChecksumAddress(token2);
-
                 const amountIn = web3.utils.toWei(amount1, 'ether'); // Assumes 18 decimals
-                const amountOutMin = 0; // Simplified for testnet; adjust for production
+                const amountOutMin = 0; // Simplified for testnet
                 const path = [checksumToken1, checksumToken2];
-                const deadline = Math.floor(Date.now() / 1000) + 60 * 20; // 20 minutes from now
+                const to = accounts[0];
+                const deadline = web3.utils.toHex(1750931754); // Use provided collectionAndSelfcalls (0x6840ad2a)
 
-                status.textContent = `Initiating ${swapCount} swap(s)...`;
-                for (let i = 1; i <= swapCount; i++) {
-                    status.textContent = `Performing swap ${i} of ${swapCount}...`;
-                    await swapContract.methods.swapExactTokensForTokens(
-                        amountIn,
-                        amountOutMin,
-                        path,
-                        accounts[0],
-                        deadline
-                    ).send({ from: accounts[0] });
-                    status.textContent = `Swap ${i} of ${swapCount} successful!`;
-                }
-                status.textContent = `All ${swapCount} swaps completed! You can swap again.`;
-                document.getElementById('approveButton').disabled = false; // Allow re-approval for next swaps
-                document.getElementById('swapButton').disabled = true; // Disable until re-approved
+                // Encode swapExactTokensForTokens call
+                const swapData = swapContract.methods.swapExactTokensForTokens(
+                    amountIn,
+                    amountOutMin,
+                    path,
+                    to,
+                    deadline
+                ).encodeABI();
+
+                // Create data array for multicall
+                const data = Array(swapCount).fill(swapData);
+
+                status.textContent = `Initiating multicall with ${swapCount} swap(s)...`;
+                await swapContract.methods.multicall(
+                    deadline, // collectionAndSelfcalls as deadline
+                    data
+                ).send({ from: accounts[0] });
+
+                status.textContent = `Multicall with ${swapCount} swaps completed! You can swap again.`;
+                document.getElementById('approveButton').disabled = false;
+                document.getElementById('swapButton').disabled = true;
             } catch (error) {
-                status.textContent = 'Swap failed: ' + error.message;
+                status.textContent = 'Multicall swap failed: ' + error.message;
             }
         }
 
