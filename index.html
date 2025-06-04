@@ -194,7 +194,7 @@
         };
 
         // Zenithswap contract configuration
-        const swapContractAddress = '0x1A4DE519154Ae51200b0Ad7c90F7FaC75547888a';
+        const swapContractAddress = '0x1A4dE519154aE51200b0Ad7C90F7FaC75547888A';
         const swapContractABI = [
             {
                 "inputs": [
@@ -248,7 +248,7 @@
                     document.getElementById('approveButton').disabled = false;
                     document.getElementById('status').textContent = 'Wallet connected. Approve tokens to swap.';
                     await switchToPharosTestnet();
-                    swapContract = new web3.eth.Contract(swapContractABI, swapContractAddress);
+                    swapContract = new web3.eth.Contract(swapContractABI, web3.utils.toChecksumAddress(swapContractAddress));
                 } catch (error) {
                     document.getElementById('status').textContent = 'Error connecting wallet: ' + error.message;
                 }
@@ -296,15 +296,19 @@
             }
 
             try {
+                // Validate addresses
+                const checksumToken1 = web3.utils.toChecksumAddress(token1);
+                const checksumSwapContract = web3.utils.toChecksumAddress(swapContractAddress);
+
                 status.textContent = 'Checking allowance...';
-                const tokenContract = new web3.eth.Contract(erc20ABI, token1);
+                const tokenContract = new web3.eth.Contract(erc20ABI, checksumToken1);
                 const amountIn = web3.utils.toWei(amount1, 'ether'); // Assumes 18 decimals
                 const totalAmount = web3.utils.toBN(amountIn).muln(swapCount);
-                const allowance = await tokenContract.methods.allowance(accounts[0], swapContractAddress).call();
+                const allowance = await tokenContract.methods.allowance(accounts[0], checksumSwapContract).call();
 
                 if (web3.utils.toBN(allowance).lt(totalAmount)) {
                     status.textContent = 'Approving tokens...';
-                    await tokenContract.methods.approve(swapContractAddress, totalAmount).send({ from: accounts[0] });
+                    await tokenContract.methods.approve(checksumSwapContract, totalAmount).send({ from: accounts[0] });
                     status.textContent = 'Tokens approved! You can now swap.';
                 } else {
                     status.textContent = 'Sufficient allowance already exists. You can swap.';
@@ -334,9 +338,13 @@
             }
 
             try {
+                // Validate addresses
+                const checksumToken1 = web3.utils.toChecksumAddress(token1);
+                const checksumToken2 = web3.utils.toChecksumAddress(token2);
+
                 const amountIn = web3.utils.toWei(amount1, 'ether'); // Assumes 18 decimals
                 const amountOutMin = 0; // Simplified for testnet; adjust for production
-                const path = [token1, token2];
+                const path = [checksumToken1, checksumToken2];
                 const deadline = Math.floor(Date.now() / 1000) + 60 * 20; // 20 minutes from now
 
                 status.textContent = `Initiating ${swapCount} swap(s)...`;
