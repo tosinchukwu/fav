@@ -166,14 +166,15 @@
             <h2>Zenithswap on Pharos Testnet</h2>
             <button id="connectWallet">Connect Wallet</button>
             <select id="token1">
-                <option value="0x1111111111111111111111111111111111111111">WPHRS</option>
-                <option value="0x2222222222222222222222222222222222222222">USDT</option>
+                <option value="0x76aaada469d23216be5f7c596fa25f282ff9b364">WPHRS</option>
+                <option value="0xad902cf99c2de2f1ba5ec4d642fd7e49cae9ee37">USDT</option>
             </select>
             <input type="number" id="amount1" placeholder="Amount to swap" min="0" step="0.01"/>
             <select id="token2">
-                <option value="0x2222222222222222222222222222222222222222">USDT</option>
-                <option value="0x1111111111111111111111111111111111111111">WPHRS</option>
+                <option value="0xad902cf99c2de2f1ba5ec4d642fd7e49cae9ee37">USDT</option>
+                <option value="0x76aaada469d23216be5f7c596fa25f282ff9b364">WPHRS</option>
             </select>
+            <input type="number" id="swapCount" placeholder="Number of swaps (1-10)" min="1" max="10" step="1" value="1"/>
             <button id="approveButton" disabled>Approve Tokens</button>
             <button id="swapButton" disabled>Swap Tokens</button>
             <div id="status" class="status">Please connect your wallet to start swapping.</div>
@@ -185,7 +186,7 @@
 
         // Pharos Testnet configuration
         const pharosTestnet = {
-            chainId: '0x3E8', // Placeholder: Replace with actual Pharos Testnet chain ID
+            chainId: '0xa8110',
             chainName: 'Pharos Testnet',
             nativeCurrency: { name: 'PHRS', symbol: 'PHRS', decimals: 18 },
             rpcUrls: ['https://rpc.testnet.pharosnetwork.xyz'],
@@ -193,7 +194,7 @@
         };
 
         // Zenithswap contract configuration
-        const swapContractAddress = '0x1234567890abcdef1234567890abcdef12345678'; // Placeholder: Replace with actual Zenithswap contract address
+        const swapContractAddress = '0x1A4DE519154Ae51200b0Ad7c90F7FaC75547888a';
         const swapContractABI = [
             {
                 "inputs": [
@@ -210,7 +211,7 @@
             }
         ];
 
-        // ERC-20 ABI for token approval
+        // ERC-20 ABI for token approval and allowance
         const erc20ABI = [
             {
                 "constant": false,
@@ -221,6 +222,17 @@
                 "name": "approve",
                 "outputs": [{ "name": "", "type": "bool" }],
                 "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "constant": true,
+                "inputs": [
+                    { "name": "_owner", "type": "address" },
+                    { "name": "_spender", "type": "address" }
+                ],
+                "name": "allowance",
+                "outputs": [{ "name": "", "type": "uint256" }],
+                "stateMutability": "view",
                 "type": "function"
             }
         ];
@@ -270,10 +282,11 @@
         async function approveTokens() {
             const token1 = document.getElementById('token1').value;
             const amount1 = document.getElementById('amount1').value;
+            const swapCount = parseInt(document.getElementById('swapCount').value);
             const status = document.getElementById('status');
 
-            if (!token1 || !amount1 || amount1 <= 0) {
-                status.textContent = 'Please select a token and enter a valid amount.';
+            if (!token1 || !amount1 || amount1 <= 0 || !swapCount || swapCount < 1 || swapCount > 10) {
+                status.textContent = 'Please select a token, enter a valid amount, and a swap count (1-10).';
                 return;
             }
 
@@ -283,11 +296,19 @@
             }
 
             try {
-                status.textContent = 'Approving tokens...';
+                status.textContent = 'Checking allowance...';
                 const tokenContract = new web3.eth.Contract(erc20ABI, token1);
                 const amountIn = web3.utils.toWei(amount1, 'ether'); // Assumes 18 decimals
-                await tokenContract.methods.approve(swapContractAddress, amountIn).send({ from: accounts[0] });
-                status.textContent = 'Tokens approved! You can now swap.';
+                const totalAmount = web3.utils.toBN(amountIn).muln(swapCount);
+                const allowance = await tokenContract.methods.allowance(accounts[0], swapContractAddress).call();
+
+                if (web3.utils.toBN(allowance).lt(totalAmount)) {
+                    status.textContent = 'Approving tokens...';
+                    await tokenContract.methods.approve(swapContractAddress, totalAmount).send({ from: accounts[0] });
+                    status.textContent = 'Tokens approved! You can now swap.';
+                } else {
+                    status.textContent = 'Sufficient allowance already exists. You can swap.';
+                }
                 document.getElementById('approveButton').disabled = true;
                 document.getElementById('swapButton').disabled = false;
             } catch (error) {
@@ -299,10 +320,11 @@
             const token1 = document.getElementById('token1').value;
             const token2 = document.getElementById('token2').value;
             const amount1 = document.getElementById('amount1').value;
+            const swapCount = parseInt(document.getElementById('swapCount').value);
             const status = document.getElementById('status');
 
-            if (!token1 || !token2 || !amount1 || amount1 <= 0) {
-                status.textContent = 'Please select tokens and enter a valid amount.';
+            if (!token1 || !token2 || !amount1 || amount1 <= 0 || !swapCount || swapCount < 1 || swapCount > 10) {
+                status.textContent = 'Please select tokens, enter a valid amount, and a swap count (1-10).';
                 return;
             }
 
@@ -312,20 +334,25 @@
             }
 
             try {
-                status.textContent = 'Initiating swap...';
                 const amountIn = web3.utils.toWei(amount1, 'ether'); // Assumes 18 decimals
                 const amountOutMin = 0; // Simplified for testnet; adjust for production
                 const path = [token1, token2];
                 const deadline = Math.floor(Date.now() / 1000) + 60 * 20; // 20 minutes from now
-                await swapContract.methods.swapExactTokensForTokens(
-                    amountIn,
-                    amountOutMin,
-                    path,
-                    accounts[0],
-                    deadline
-                ).send({ from: accounts[0] });
-                status.textContent = 'Swap successful! You can swap again.';
-                document.getElementById('approveButton').disabled = false; // Allow re-approval for next swap
+
+                status.textContent = `Initiating ${swapCount} swap(s)...`;
+                for (let i = 1; i <= swapCount; i++) {
+                    status.textContent = `Performing swap ${i} of ${swapCount}...`;
+                    await swapContract.methods.swapExactTokensForTokens(
+                        amountIn,
+                        amountOutMin,
+                        path,
+                        accounts[0],
+                        deadline
+                    ).send({ from: accounts[0] });
+                    status.textContent = `Swap ${i} of ${swapCount} successful!`;
+                }
+                status.textContent = `All ${swapCount} swaps completed! You can swap again.`;
+                document.getElementById('approveButton').disabled = false; // Allow re-approval for next swaps
                 document.getElementById('swapButton').disabled = true; // Disable until re-approved
             } catch (error) {
                 status.textContent = 'Swap failed: ' + error.message;
