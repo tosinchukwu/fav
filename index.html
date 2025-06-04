@@ -9,7 +9,7 @@
     <link rel="apple-touch-icon" sizes="512x512" href="/images/512x512_App_Icon.png"/>
     <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
     <meta name="theme-color" content="#fff"/>
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' 'wasm-unsafe-eval' data: https://translate.googleapis.com/ https://vercel.com https://vercel.live/ https://www.google-analytics.com https://www.googletagmanager.com https://challenges.cloudflare.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' 'unsafe-eval'; img-src * 'self' blob: data: https://assets.coingecko.com/ https://cdn.center.app/ https://ethereum-optimism.github.io/ https://explorer-api.walletconnect.com/ https://i.seadn.io/ https://lh3.googleusercontent.com/ https://openseauserdata.com/ https://raw.githubusercontent.com/ https://raw.seadn.io/ https://s2.coinmarketcap.com/ https://static.optimism.io/ https://vercel.com https://vercel.live/ https://trustwallet.com/ https://cloudflare-ipfs.com/ https://challenges.cloudflare.com; frame-src 'self' https://buy.moonpay.com/ https://vercel.com https://vercel.live/ https://verify.walletconnect.com/ https://verify.walletconnect.org/ https://challenges.cloudflare.com; connect-src * 'self' blob: data: https://statsigapi.net https://api.moonpay.com/ https://api.opensea.io https://api.thegraph.com/ https://arbitrum-mainnet.infura.io/ https://avalanche-mainnet.infura.io/ https://base-mainnet.infura.io/ https://bridge.arbitrum.io https://celo-org.github.io https://cloudflare-ipfs.com https://explorer-api.walletconnect.com https://forno.celo.org/ https://gateway.ipfs.io/ https://mainnet.infura.io https://o1037921.ingest.sentry.io https://old-wispy-arrow.bsc.quiknode.pro/ https://optimism-mainnet.infura.io/ https://polygon-mainnet.infura.io/ https://raw.githubusercontent.com https://static.optimism.io https://tokenlist.arbitrum.io https://tokens.coingecko.com https://ultra-blue-flower.quiknode.pro https://vercel.com https://vercel.live/ https://www.gemini.com wss://relay.walletconnect.com/ wss://www.walletlink.org/rpc https://challenges.cloudflare.com https://rpc.testnet.pharosnetwork.xyz; worker-src 'self' blob:;"/>
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' 'wasm-unsafe-eval' data: https://translate.googleapis.com/ https://vercel.com https://vercel.live/ https://www.google-analytics.com https://www.googletagmanager.com https://challenges.cloudflare.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' 'unsafe-eval'; img-src * 'self' blob: data: https://assets.coingecko.com/ https://cdn.center.app/ https://ethereum-optimism.github.io/ https://explorer-api.walletconnect.com/ https://i.seadn.io/ https://lh3.googleusercontent.com/ https://openseauserdata.com/ https://raw.githubusercontent.com/ https://raw.seadn.io/ https://s2.coinmarketcap.com/ https://static.optimism.io/ https://vercel.com https://vercel.live/ https://trustwallet.com/ https://cloudflare-ipfs.com/ https://challenges.cloudflare.com; frame-src 'self' https://buy.moonpay.com/ https://vercel.com https://vercel.live/ https://verify.walletconnect.com/ https://verify.walletconnect.org/ https://challenges.cloudflare.com; connect-src * 'self' blob: data: https://statsigapi.net https://api.moonpay.com/ https://api.opensea.io https://api.the Fifteen.com/ https://arbitrum-mainnet.infura.io/ https://avalanche-mainnet.infura.io/ https://base-mainnet.infura.io/ https://bridge.arbitrum.io https://celo-org.github.io https://cloudflare-ipfs.com https://explorer-api.walletconnect.com https://forno.celo.org/ https://gateway.ipfs.io/ https://mainnet.infura.io https://o1037921.ingest.sentry.io https://old-wispy-arrow.bsc.quiknode.pro/ https://optimism-mainnet.infura.io/ https://polygon-mainnet.infura.io/ https://raw.githubusercontent.com https://static.optimism.io https://tokenlist.arbitrum.io https://tokens.coingecko.com https://ultra-blue-flower.quiknode.pro https://vercel.com https://vercel.live/ https://www.gemini.com wss://relay.walletconnect.com/ wss://www.walletlink.org/rpc https://challenges.cloudflare.com https://rpc.testnet.pharosnetwork.xyz; worker-src 'self' blob:;"/>
     <meta name="apple-itunes-app" content="app-id=6443944476"/>
     <link rel="manifest" href="/manifest.json"/>
     <link rel="preconnect" href="https://main-subgraph.__HOST__.com/" crossorigin/>
@@ -166,6 +166,11 @@
             <h2>Swap on Pharos Testnet</h2>
             <div id="balance" class="status">Balance: Not connected</div>
             <div id="txnCount" class="status">Total Transactions: 0</div>
+            <select id="walletType">
+                <option value="metamask">MetaMask</option>
+                <option value="okx">OKX Wallet</option>
+                <option value="bitget">Bitget Wallet</option>
+            </select>
             <button id="connectWallet">Connect Wallet</button>
             <select id="token1">
                 <option value="0x76aaada469d23216be5f7c596fa25f282ff9b364">WPHRS</option>
@@ -179,7 +184,7 @@
             <input type="number" id="swapCount" placeholder="Number of swaps (1-10)" min="1" max="10" step="1" value="1"/>
             <button id="approveButton" disabled>Approve Tokens</button>
             <button id="swapButton" disabled>Swap Tokens</button>
-            <div id="status" class="status">Please connect your wallet to start swapping.</div>
+            <div id="status" class="status">Please select a wallet and connect to start swapping. Use OKX or Bitget mobile app browser.</div>
             <div id="txnLinks" class="status"></div>
         </div>
     </div>
@@ -208,6 +213,19 @@
                     { "internalType": "uint256", "name": "deadline", "type": "uint256" }
                 ],
                 "name": "swapExactTokensForTokens",
+                "outputs": [{ "internalType": "uint256[]", "name": "amounts", "type": "uint256[]" }],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    { "internalType": "uint256[]", "name": "amountsIn", "type": "uint256[]" },
+                    { "internalType": "uint256[]", "name": "amountsOutMin", "type": "uint256[]" },
+                    { "internalType": "address[][]", "name": "paths", "type": "address[][]" },
+                    { "internalType": "address", "name": "to", "type": "address" },
+                    { "internalType": "uint256", "name": "deadline", "type": "uint256" }
+                ],
+                "name": "batchSwapExactTokensForTokens",
                 "outputs": [{ "internalType": "uint256[]", "name": "amounts", "type": "uint256[]" }],
                 "stateMutability": "nonpayable",
                 "type": "function"
@@ -248,7 +266,7 @@
             }
         ];
 
-        let web3, accounts, swapContract, totalTxnCount = 0;
+        let web3, accounts, swapContract, totalTxnCount = 0, walletProvider;
 
         function updateTxnCount() {
             document.getElementById('txnCount').textContent = `Total Transactions: ${totalTxnCount}`;
@@ -272,46 +290,53 @@
         }
 
         async function initWeb3() {
+            const walletType = document.getElementById('walletType').value;
+            const status = document.getElementById('status');
+
+            // Check for mobile wallet provider
             if (!window.ethereum) {
-                document.getElementById('status').textContent = 'Please install MetaMask to use this feature.';
+                status.textContent = `Please open this DApp in the ${walletType === 'metamask' ? 'MetaMask' : walletType === 'okx' ? 'OKX Wallet' : 'Bitget Wallet'} mobile app browser.`;
                 return;
             }
 
+            walletProvider = window.ethereum;
             try {
-                web3 = new Web3(window.ethereum);
-                accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                web3 = new Web3(walletProvider);
+                // Request accounts
+                accounts = await walletProvider.request({ method: 'eth_requestAccounts' });
+
                 document.getElementById('connectWallet').textContent = `Connected: ${accounts[0].slice(0, 6)}...${accounts[0].slice(-4)}`;
                 document.getElementById('approveButton').disabled = false;
-                document.getElementById('status').textContent = 'Wallet connected. Approve tokens to swap.';
-                
+                status.textContent = 'Wallet connected. Approve tokens to swap.';
+
                 // Switch to Pharos Testnet
                 await switchToPharosTestnet();
-                
+
                 // Initialize contract
                 swapContract = new web3.eth.Contract(swapContractABI, web3.utils.toChecksumAddress(swapContractAddress));
-                
+
                 // Update balance and transaction count
                 await updateBalance();
                 updateTxnCount();
-                
+
                 // Add event listener for token selection change
                 document.getElementById('token1').addEventListener('change', updateBalance);
             } catch (error) {
-                document.getElementById('status').textContent = 'Error connecting wallet: ' + error.message;
+                status.textContent = `Error connecting ${walletType === 'metamask' ? 'MetaMask' : walletType === 'okx' ? 'OKX Wallet' : 'Bitget Wallet'}: ${error.message}`;
                 console.error('Web3 initialization error:', error);
             }
         }
 
         async function switchToPharosTestnet() {
             try {
-                await window.ethereum.request({
+                await walletProvider.request({
                     method: 'wallet_switchEthereumChain',
                     params: [{ chainId: pharosTestnet.chainId }]
                 });
             } catch (switchError) {
                 if (switchError.code === 4902) {
                     try {
-                        await window.ethereum.request({
+                        await walletProvider.request({
                             method: 'wallet_addEthereumChain',
                             params: [pharosTestnet]
                         });
@@ -348,14 +373,14 @@
                 const tokenContract = new web3.eth.Contract(erc20ABI, checksumToken1);
                 const amountIn = web3.utils.toWei(amount1, 'ether');
                 const totalAmount = web3.utils.toBN(amountIn).muln(swapCount);
-                
+
                 status.textContent = 'Checking allowance...';
                 const allowance = await tokenContract.methods.allowance(accounts[0], checksumSwapContract).call();
 
                 if (web3.utils.toBN(allowance).lt(totalAmount)) {
                     status.textContent = 'Approving tokens...';
                     const gasPrice = await web3.eth.getGasPrice() * 1.2;
-                    const tx = await tokenContract.methods.approve(checksumSwapContract, totalAmount).send({ 
+                    const tx = await tokenContract.methods.approve(checksumSwapContract, totalAmount).send({
                         from: accounts[0],
                         gasPrice: Math.floor(gasPrice)
                     });
@@ -401,39 +426,36 @@
                 const path = [checksumToken1, checksumToken2];
                 const deadline = Math.floor(Date.now() / 1000) + 60 * 5;
 
-                status.textContent = `Initiating ${swapCount} swap(s)...`;
-                for (let i = 1; i <= swapCount; i++) {
-                    try {
-                        status.textContent = `Performing swap ${i} of ${swapCount}...`;
-                        const gasPrice = await web3.eth.getGasPrice() * 1.2;
-                        const tx = await swapContract.methods.swapExactTokensForTokens(
-                            amountIn,
-                            amountOutMin,
-                            path,
-                            accounts[0],
-                            deadline
-                        ).send({ 
-                            from: accounts[0],
-                            gasPrice: Math.floor(gasPrice)
-                        });
-                        totalTxnCount++;
-                        updateTxnCount();
-                        status.textContent = `Swap ${i} of ${swapCount} successful!`;
-                        txnLinks.innerHTML += `<div>Swap ${i} Tx: <a href="${pharosTestnet.blockExplorerUrls[0]}/tx/${tx.transactionHash}" target="_blank">${tx.transactionHash.slice(0, 6)}...${tx.transactionHash.slice(-4)}</a></div>`;
-                    } catch (swapError) {
-                        status.textContent = `Swap ${i} failed: ${swapError.message}`;
-                        console.error(`Swap ${i} error:`, swapError);
-                        continue; // Continue with next swap
-                    }
-                }
+                // Prepare batch swap parameters
+                const amountsIn = new Array(swapCount).fill(amountIn);
+                const amountsOutMin = new Array(swapCount).fill(amountOutMin);
+                const paths = new Array(swapCount).fill(path);
 
-                status.textContent = `All ${swapCount} swaps completed! You can swap again.`;
+                status.textContent = `Initiating batch swap for ${swapCount} swap(s)...`;
+                const gasPrice = await web3.eth.getGasPrice() * 1.2;
+                const tx = await swapContract.methods.batchSwapExactTokensForTokens(
+                    amountsIn,
+                    amountsOutMin,
+                    paths,
+                    accounts[0],
+                    deadline
+                ).send({
+                    from: accounts[0],
+                    gasPrice: Math.floor(gasPrice)
+                });
+
+                totalTxnCount++;
+                updateTxnCount();
+                status.textContent = `Batch swap of ${swapCount} swaps successful!`;
+                txnLinks.innerHTML += `<div>Batch Swap Tx: <a href="${pharosTestnet.blockExplorerUrls[0]}/tx/${tx.transactionHash}" target="_blank">${tx.transactionHash.slice(0, 6)}...${tx.transactionHash.slice(-4)}</a></div>`;
+
+                status.textContent = `All ${swapCount} swaps completed in one transaction! You can swap again.`;
                 document.getElementById('approveButton').disabled = false;
                 document.getElementById('swapButton').disabled = true;
                 await updateBalance();
             } catch (error) {
-                status.textContent = 'Swap process failed: ' + error.message;
-                console.error('Swap process error:', error);
+                status.textContent = 'Batch swap failed: ' + error.message;
+                console.error('Batch swap error:', error);
             }
         }
 
@@ -449,4 +471,4 @@
         });
     </script>
 </body>
-</html>
+    </html>
