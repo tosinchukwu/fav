@@ -1,7 +1,7 @@
-<!doctype html>
+<!DOCTYPE html>
 <html translate="no">
 <head>
-    <meta charset="utf-8"/>
+    <meta charset="UTF-8"/>
     <title>Testing: Pharos Testnet</title>
     <meta name="description" content="A secure and lightning-fast DEX on Pharos Network for seamless crypto trading."/>
     <link rel="shortcut icon" type="image/jpg" href="/favicon.svg"/>
@@ -267,6 +267,17 @@
 
         let web3, accounts, swapContract, totalTxnCount = 0, isApproved = false;
 
+        // Simple revert reason decoder
+        function decodeRevertReason(errorData) {
+            if (!errorData || !errorData.startsWith('0x08c379a0')) return 'Unknown revert reason';
+            const messageHex = errorData.slice(74); // Skip selector and offset
+            try {
+                return web3.utils.hexToUtf8('0x' + messageHex);
+            } catch {
+                return 'Error decoding revert reason';
+            }
+        }
+
         function updateTxnCount() {
             document.getElementById('txnCount').textContent = `Total Transactions: ${totalTxnCount}`;
         }
@@ -281,7 +292,7 @@
                 const tokenContract = new web3.eth.Contract(erc20ABI, web3.utils.toChecksumAddress(token1));
                 const balance = await tokenContract.methods.balanceOf(accounts[0]).call();
                 const balanceInEther = web3.utils.fromWei(balance, 'ether');
-                document.getElementById('balance').textContent = `Balance: ${parseFloat(balanceInEther).toFixed(4)} ${token1 === '0x76aaada469d23216be5f7c596fa25f282ff9b364' ? 'WPHRS' : 'USDT'}`;
+                document.getElementById('balance').textContent = `Balance: ${parseFloat(balanceInEther).toFixed(6)} ${token1 === '0x76aaada469d23216be5f7c596fa25f282ff9b364' ? 'WPHRS' : 'USDT'}`;
             } catch (error) {
                 document.getElementById('balance').textContent = 'Balance: Error fetching balance';
                 console.error('Balance fetch error:', error.message, error.stack);
@@ -313,7 +324,7 @@
             try {
                 web3 = new Web3(window.ethereum);
                 
-                // Request account access directly
+                // Request account access
                 try {
                     accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
                 } catch (error) {
@@ -336,15 +347,15 @@
                 // Initialize contract
                 swapContract = new web3.eth.Contract(swapContractABI, web3.utils.toChecksumAddress(swapContractAddress));
                 
-                // Check if already approved
+                // Check allowance
                 await checkAllowance();
                 
-                // Update balance, network status, and transaction count
+                // Update UI
                 await updateBalance();
                 await updateNetworkStatus();
                 updateTxnCount();
                 
-                // Add MetaMask event listeners
+                // MetaMask event listeners
                 window.ethereum.on('accountsChanged', (newAccounts) => {
                     accounts = newAccounts;
                     if (accounts.length === 0) {
@@ -434,7 +445,7 @@
                     status.textContent = 'Approve tokens to swap.';
                 }
             } catch (error) {
-                status.textContent = 'Error checking allowance: ' + error.message;
+                status.textContent = `Error checking allowance: ${error.message}`;
                 console.error('Allowance check error:', error.message, error.stack);
             }
         }
@@ -473,7 +484,7 @@
                 const tx = await tokenContract.methods.approve(checksumSwapContract, totalAmount).send({ 
                     from: accounts[0],
                     gasPrice: Math.floor(gasPrice),
-                    gas: Math.floor(gas * 1.2)
+                    gas: Math.floor(gas * 1.5)
                 });
                 totalTxnCount++;
                 updateTxnCount();
@@ -517,7 +528,7 @@
                 return;
             }
 
-            // Check allowance before swapping
+            // Check allowance
             await checkAllowance();
             if (!isApproved) {
                 status.textContent = 'Please approve tokens before swapping.';
@@ -528,10 +539,16 @@
                 const checksumToken1 = web3.utils.toChecksumAddress(token1);
                 const checksumToken2 = web3.utils.toChecksumAddress(token2);
                 const amountIn = web3.utils.toWei(amount1, 'ether');
-                const amountOutMin = 0; // Consider adding slippage protection
+                
+                // Get current block timestamp for deadline
+                const latestBlock = await web3.eth.getBlock('latest');
+                const currentTimestamp = latestBlock.timestamp;
+                const deadline = Number(currentTimestamp) + 60 * 10; // 10 minutes from now
+                
+                // Set amountOutMin to prevent slippage (95% of expected output)
+                const amountOutMin = web3.utils.toBN(amountIn).muln(95).divn(100).toString();
                 const path = [checksumToken1, checksumToken2];
-                const deadline = Math.floor(Date.now() / 1000) + 60 * 5; // 5 minutes from now
-                const collectionAndSelfcalls = 0; // Fallback value; adjust based on contract requirements
+                const collectionAndSelfcalls = 0; // Fallback; test with deadline if needed
 
                 // Log parameters for debugging
                 console.log('Swap parameters:', {
@@ -543,7 +560,8 @@
                     to: accounts[0],
                     deadline,
                     collectionAndSelfcalls,
-                    swapCount
+                    swapCount,
+                    currentTimestamp
                 });
 
                 // Prepare multicall data
@@ -565,14 +583,15 @@
                 try {
                     gas = await swapContract.methods.multicall(collectionAndSelfcalls, callData).estimateGas({ from: accounts[0] });
                 } catch (gasError) {
-                    status.textContent = `Gas estimation failed: ${gasError.message || 'Unknown error'}`;
-                    console.error('Gas estimation error:', gasError.message, gasError.stack);
+                    const revertReason = gasError.data ? decodeRevertReason(gasError.data) : gasError.message;
+                    status.textContent = `Gas estimation failed: ${revertReason || 'Unknown error'}`;
+                    console.error('Gas estimation error:', gasError.message, gasError.stack, { data: gasError.data });
                     return;
                 }
                 const tx = await swapContract.methods.multicall(collectionAndSelfcalls, callData).send({ 
                     from: accounts[0],
                     gasPrice: Math.floor(gasPrice),
-                    gas: Math.floor(gas * 1.2)
+                    gas: Math.floor(gas * 1.5)
                 });
                 totalTxnCount++;
                 updateTxnCount();
@@ -583,8 +602,9 @@
                 document.getElementById('swapButton').disabled = false;
                 await updateBalance();
             } catch (error) {
-                status.textContent = `Swap process failed: ${error.code ? `Code ${error.code}: ` : ''}${error.message || 'Unknown error'}`;
-                console.error('Swap process error:', error.message, error.stack);
+                const revertReason = error.data ? decodeRevertReason(error.data) : error.message;
+                status.textContent = `Swap failed: ${error.code ? `Code ${error.code}: ` : ''}${revertReason || 'Unknown error'}`;
+                console.error('Swap error:', error.message, error.stack, { data: error.data });
             }
         }
 
@@ -596,7 +616,7 @@
         document.getElementById('amount1').addEventListener('input', checkAllowance);
         document.getElementById('swapCount').addEventListener('input', checkAllowance);
 
-        // Initialize balance and transaction count on page load
+        // Initialize UI on page load
         document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('balance').textContent = 'Balance: Not connected';
             updateTxnCount();
