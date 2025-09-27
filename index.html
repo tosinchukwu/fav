@@ -1,33 +1,142 @@
 <!DOCTYPE html>
-
-<html>
+<html lang="en">
 <head>
-  <meta http-equiv="CONTENT-TYPE" content="text/html; charset=UTF-8">
+  <meta charset="UTF-8">
   <title>Login Page!</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      background-color: skyblue;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    h1 {
+      background-color: black;
+      color: gold;
+      text-align: center;
+      margin: 0;
+      padding: 15px;
+    }
+
+    h1 span { color: #f57326; }
+
+    .container {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .login-box {
+      background-color: slategray;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      width: 100%;
+      max-width: 400px;
+    }
+
+    .login-box h3 {
+      background-color: gray;
+      color: black;
+      padding: 10px;
+      border-radius: 5px;
+      margin-top: 0;
+      text-align: center;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    label {
+      font-weight: bold;
+      color: black;
+    }
+
+    input[type="text"],
+    input[type="password"] {
+      padding: 8px;
+      font-size: 1rem;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .forgot {
+      font-size: 12px;
+      text-align: right;
+      margin-top: -10px;
+    }
+
+    .forgot a {
+      text-decoration: none;
+      color: darkblue;
+    }
+
+    input[type="submit"] {
+      background-color: blue;
+      color: white;
+      padding: 10px;
+      font-size: 1rem;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    input[type="submit"]:hover {
+      background-color: darkblue;
+    }
+
+    footer {
+      text-align: center;
+      color: white;
+      font-weight: bold;
+      padding: 10px;
+      background-color: black;
+    }
+  </style>
 </head>
-<body style="background-color: skyblue; ">
- <h1 style="background-color: black; color: gold; text-align: center;">Welcome to Student<span style="color: #f57326;"> Portal</span>
+<body>
+  <h1>
+    Welcome to Student <span>Portal</span>
   </h1>
- 
-  <div style="background-color:slategray;">
-  <h3 style="background-color: gray; color: black;"> Login below to view your dashbord.</h3>
-    <br><br>
-    <form>
-  <label for="username" style="color: black;"><b>Username:</b></label>
-  <input type="text" id="username" name="username" style="margin-left: 30px;"><br><br>
-  
-  <label for="password" style="color: black ;"><b>Password:</b></label>
-  <input type="password" id="password" name="password" style="margin-left: 32px;"><br>
-    <a href="" style="margin-left: 128px; font-size: 12px;">Forget password</a><br>
-    <br><br>
-  <input type="submit" value="Login" style="margin-left: 300px; background-color:blue; color:white;"><br><br><br><br><br>
-      <br><br><br><br><br><br><br> <br>
 
-    </form>
-     
-   </div>
+  <div class="container">
+    <div class="login-box">
+      <h3>Login below to view your dashboard.</h3>
+      <form>
+        <div>
+          <label for="username">Username:</label>
+          <input type="text" id="username" name="username">
+        </div>
 
-  <p style="color: white; text-align: center; font-weight:bold; ">Tosinchukwu© 2025</p>
+        <div>
+          <label for="password">Password:</label>
+          <input type="password" id="password" name="password">
+        </div>
 
+        <div class="forgot">
+          <a href="#">Forgot password?</a>
+        </div>
+
+        <input type="submit" value="Login">
+      </form>
+    </div>
+  </div>
+
+  <footer>
+    Tosinchukwu © 2025
+  </footer>
 </body>
 </html>
